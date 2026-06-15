@@ -318,7 +318,7 @@ st.dataframe(details_df, use_container_width=True, hide_index=True)
 st.divider()
 
 # ==========================
-# 📋 INVENTORY LIST (EDIT + DELETE)
+# 📋 INVENTORY LIST (with EDIT + DELETE)
 # ==========================
 st.subheader("📋 Inventory List")
 
