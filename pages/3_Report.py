@@ -110,7 +110,7 @@ def generate_pdf(dataframe):
     table.setStyle(style)
 
     doc.build([table])
-    buffer.seek(0);
+    buffer.seek(0)
     return buffer
 
 
