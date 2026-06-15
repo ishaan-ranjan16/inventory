@@ -6,7 +6,6 @@ cur= conn.cursor()
 if conn :
     print("DB connected successfully")
 
-
 cur.execute("SELECT * from inventory ")
 
 rows = cur.fetchall()
