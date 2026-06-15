@@ -383,7 +383,7 @@ for _, row in list_df.iterrows():
         st.session_state.edit_row = row.to_dict()
         edit_inventory_dialog()
 
-    # c_gap is left empty — acts as visual spacer
+    # c_gap is left empty — acts as spacer
 
     if c15.button("🗑", key=f"del_{uid}"):
         delete_inventory(row["serial_no"])

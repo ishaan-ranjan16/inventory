@@ -121,41 +121,7 @@ def delete_employee(emp_id):
             conn.close()
 
 
-
-# def update_employee(emp_id, data):
-#     try:
-#         conn = get_connection()
-#         cur = conn.cursor()
-
-#         cur.execute("""
-#             UPDATE employees
-#             SET
-#                 employee_id=%s,
-#                 employee_name=%s,
-#                 designation=%s,
-#                 department=%s,
-#                 email=%s,
-#                 contact=%s,
-#                 status=%s,
-#                 updated_by=%s,
-#                 updated_at=NOW()
-#             WHERE employee_id=%s
-#         """, data)
-
-#         conn.commit()
-
-#     except Exception as e:
-#         st.error(f"DB Error: {e}")
-
-#     finally:
-#         if 'cur' in locals():
-#             cur.close()
-#         if 'conn' in locals():
-#             conn.close()
-
-
-
-# ***************************
+# *************************
 # LOAD DATA
 # =========================
 df = fetch_employees()
@@ -177,7 +143,7 @@ c2.metric("Active Employees", active_emp)
 st.divider()
 
 # =========================
-# ADD EMPLOYEE
+# ADD EMPLOYEE -
 # =========================
 
 st.subheader("📝 Add Employee")
@@ -330,65 +296,3 @@ if keyword:
 st.dataframe(filtered, use_container_width=True, hide_index=True)
 st.divider()
 
-# =========================
-# EMPLOYEE → INVENTORY VIEW
-# =========================
-
-# st.subheader("💻 Employee Asset Details")
-
-# if not df.empty and "inventory" in st.session_state:
-
-#     employee_list = df.apply(
-#         lambda x: f"{x['employee_id']} - {x['employee_name']}",
-#         axis=1
-#     ).tolist()
-
-#     selected = st.selectbox("Select Employee", employee_list)
-
-#     emp_id = selected.split(" - ")[0]
-
-#     emp_assets = st.session_state.inventory[
-#         st.session_state.inventory["handover_to"] == emp_id
-#     ]
-
-#     st.write(f"📦 Assigned Assets: {len(emp_assets)}")
-#     st.dataframe(emp_assets, use_container_width=True, hide_index=True)
-
-# else:
-#     st.info("No inventory data available")
-
-# =========================
-# EMPLOYEE → INVENTORY VIEW
-# =========================
-
-# st.subheader("💻 Employee Asset Details")
-
-# if not df.empty:
-
-#     employee_list = df.apply(
-#         lambda x: f"{x['employee_id']} - {x['employee_name']}",
-#         axis=1
-#     ).tolist()
-
-#     selected = st.selectbox(
-#         "Select Employee",
-#         employee_list
-#     )
-
-#     emp_id = selected.split(" - ")[0]
-
-#     # emp_assets = fetch_employee_assets(emp_id)
-
-#     st.write(f"📦 Assigned Assets: {len(emp_assets)}")
-
-#     if not emp_assets.empty:
-#         st.dataframe(
-#             emp_assets,
-#             use_container_width=True,
-#             hide_index=True
-#         )
-#     else:
-#         st.info("No assets assigned")
-
-# else:
-#     st.info("No employees available")s
