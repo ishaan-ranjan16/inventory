@@ -106,21 +106,8 @@ The app will open in your browser at `http://localhost:8501`.
 | 📁 Reports | Analytics and business performance summaries        |
 
 ---
-
-## 🤝 Contributing
-
-Contributions are welcome! Please fork the repository and submit a pull request.
-
-1. Fork the repo
-2. Create your feature branch (`git checkout -b feature/your-feature`)
-3. Commit your changes (`git commit -m 'Add your feature'`)
-4. Push to the branch (`git push origin feature/your-feature`)
-5. Open a Pull Request
-
----
-
 ## 📄 License
 
-This project is open source. Feel free to use and modify it.
+This project is currently open source. Feel free to use and go through it.
 
 ---
