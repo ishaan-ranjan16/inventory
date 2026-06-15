@@ -223,7 +223,7 @@ CREATE DATABASE inventory_db;
 Create a `.env` file in the project root:
 
 ```env
-DB_HOST=localhost
+DB_HOST= localhost
 DB_NAME=inventory_db
 DB_USER=your_username
 DB_PASSWORD=your_password
