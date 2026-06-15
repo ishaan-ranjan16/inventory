@@ -140,7 +140,26 @@ A web-based **Inventory Management System** built with **Python** and **Streamli
 
 ---
 
-## 📁 Project Structure -
+## 📁 Project Structure
+
+```
+INVENTORY_MGT/
+├── Home.py                         # Main entry point — home dashboard
+├── db_connection.py                # PostgreSQL connection utility
+├── test.py                         # Testing script
+├── .env                            # Environment variables (gitignored)
+├── .gitignore                      # Git ignore rules
+├── README.md                       # Project documentation
+├── pages/                          # Streamlit multi-page app pages
+│   ├── 1_Inventory-Section.py      # Inventory management page
+│   ├── 2_Employee-Section.py       # Employee management page
+│   ├── 3_Dashboard-T1.py           # Dashboard overview (Type 1)
+│   ├── 4_Report.py                 # Reports & analytics page
+│   └── 5_Dashboard-T2.py           # Dashboard overview (Type 2)
+└── __pycache__/                    # Python bytecode cache (gitignored)
+```
+
+<!-- ## 📁 Project Structure -
 
 INVENTORY_MGT/
 
@@ -166,7 +185,7 @@ INVENTORY_MGT/
 
 ├── 4_Report.py             # Reports & analytics page
 
-└── 5_Dashboard-T2.py       # Dashboard overview (Type 2)
+└── 5_Dashboard-T2.py       # Dashboard overview (Type 2) -->
 
 ---
 
