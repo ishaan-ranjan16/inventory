@@ -108,6 +108,6 @@ The app will open in your browser at `http://localhost:8501`.
 ---
 ## 📄 License
 
-This project is currently open source. Feel free to use and go through it.
+This project is currently open source. Feel free to go through it.
 
 ---
