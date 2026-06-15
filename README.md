@@ -225,7 +225,7 @@ Create a `.env` file in the project root:
 ```env
 DB_HOST=localhost
 DB_NAME=inventory_db
-DB_USER=postgres
+DB_USER=your_username
 DB_PASSWORD=your_password
 DB_PORT=5432
 ```
