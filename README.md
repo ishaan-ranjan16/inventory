@@ -1,1 +1,126 @@
-(empty)
+# 📦 Inventory Management System
+
+A web-based **Inventory Management System** built with **Python** and **Streamlit**, backed by a **PostgreSQL** database. It provides a clean, multi-page dashboard to manage inventory records, employee details, and business reports — all from one centralized interface.
+
+---
+
+## 🚀 Features
+
+- 🏠 **Home Dashboard** — Quick access cards and system overview
+- 📦 **Inventory Management** — Add, update, search, and track product stock
+- 👨‍💼 **Employee Management** — Manage employee records and department details
+- 📊 **Reports & Analytics** — View business performance and stock summaries
+- 🔍 **Search & Filters** — Quickly locate records across modules
+- ✅ **Status Tracking** — Monitor inventory and employee status in real time
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer       | Technology          |
+|-------------|---------------------|
+| Frontend    | Streamlit           |
+| Backend     | Python              |
+| Database    | PostgreSQL          |
+| DB Driver   | psycopg2            |
+
+---
+
+## 📁 Project Structure
+
+```
+inventory/
+├── Home.py                # Main entry point — home dashboard page
+├── db_connection.py       # PostgreSQL connection utility
+├── pages/                 # Streamlit multi-page app pages
+│   ├── Inventory.py       # Inventory management page
+│   ├── Employees.py       # Employee management page
+    ├── Dashboard.py       # Dashboard overview page
+│   └── Report.py         # Reports & analytics page
+└── __pycache__/           # Python bytecode cache
+```
+
+---
+
+## ⚙️ Getting Started
+
+### Prerequisites
+
+- Python 3.8+
+- PostgreSQL installed and running
+- pip
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/ishaan-ranjan16/inventory.git
+cd inventory
+```
+
+### 2. Install Dependencies
+
+```bash
+pip install streamlit psycopg2
+```
+
+### 3. Set Up the Database
+
+Create a PostgreSQL database named `inventory_db`:
+
+```sql
+CREATE DATABASE inventory_db;
+```
+
+Then update the credentials in `db_connection.py` to match your local PostgreSQL setup:
+
+```python
+conn = psycopg2.connect(
+    host="localhost",
+    database="inventory_db",
+    user="your_username",
+    password="your_password",
+    port=5432
+)
+```
+
+> ⚠️ **Note:** Avoid committing plain-text credentials. Consider using environment variables or a `.env` file with `python-dotenv`.
+
+### 4. Run the Application
+
+```bash
+streamlit run Home.py
+```
+
+The app will open in your browser at `http://localhost:8501`.
+
+---
+
+## 📸 Pages Overview
+
+| Page       | Description                                         |
+|------------|-----------------------------------------------------|
+| 🏠 Home    | Welcome dashboard with quick-access cards           |
+| 📦 Inventory | Add and manage products and stock levels          |
+| 👨‍💼 Employees | View and update employee records                  |
+| 📊 Dashboard | Visualize inventory and employee stats             |
+| 📁 Reports | Analytics and business performance summaries        |
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please fork the repository and submit a pull request.
+
+1. Fork the repo
+2. Create your feature branch (`git checkout -b feature/your-feature`)
+3. Commit your changes (`git commit -m 'Add your feature'`)
+4. Push to the branch (`git push origin feature/your-feature`)
+5. Open a Pull Request
+
+---
+
+## 📄 License
+
+This project is open source. Feel free to use and modify it.
+
+---
