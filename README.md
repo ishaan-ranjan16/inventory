@@ -1,6 +1,6 @@
 # 📦 Inventory Management System
 
-A web-based **Inventory Management System** built with **Python** and **Streamlit**, backed by a **PostgreSQL** database. It provides a clean, multi-page dashboard to manage inventory records, employee details, and business reports — all from one centralized interface.
+A web-based **Inventory Management System** built with **Python** and **Streamlit**, backed by a **PostgreSQL** database. It provides a clean, multi-page dashboard to manage inventory records, employee details, and reports — all from one centralized interface.
 
 ---
 
@@ -9,7 +9,7 @@ A web-based **Inventory Management System** built with **Python** and **Streamli
 - 🏠 **Home Dashboard** — Quick access cards and system overview
 - 📦 **Inventory Management** — Add, update, search, and track product stock
 - 👨‍💼 **Employee Management** — Manage employee records and department details
-- 📊 **Reports & Analytics** — View business performance and stock summaries
+- 📊 **Reports & Analytics** — View report summary
 - 🔍 **Search & Filters** — Quickly locate records across modules
 - ✅ **Status Tracking** — Monitor inventory and employee status in real time
 
