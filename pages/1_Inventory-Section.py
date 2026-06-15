@@ -264,88 +264,6 @@ def edit_inventory_dialog():
         if cancel:
             st.rerun()
 
-# # ==========================
-# # LOAD DATA
-# # ==========================
-# df = fetch_inventory()
-
-# if not df.empty:
-#     df.columns = df.columns.str.strip().str.lower()
-
-# # ==========================
-# # METRICS
-# # ==========================
-# total = len(df)
-# issued = len(df[df["status"] == "Issued"]) if not df.empty else 0
-# available = len(df[df["status"] == "In-Inventory"]) if not df.empty else 0
-# damaged = len(df[df["status"] == "Damaged"]) if not df.empty else 0
-
-# c1, c2, c3, c4 = st.columns(4)
-# c1.metric("Total", total)
-# c2.metric("Issued", issued)
-# c3.metric("Available", available)
-# c4.metric("Damaged", damaged)
-
-# st.divider()
-
-# # ==========================
-# # ADD BUTTON
-# # ==========================
-# if st.button("➕ Add Inventory"):
-#     add_inventory_dialog()
-
-# st.divider()
-
-# st.subheader("📋 Inventory List")
-
-# search2 = st.text_input("Search Inventory List")
-
-# list_df = df.copy()
-
-# if search2:
-#     list_df = list_df[
-#         list_df.apply(
-#             lambda r: r.astype(str).str.contains(search2, case=False, na=False).any(),
-#             axis=1
-#         )
-#     ]
-
-# # headers
-# h1, h2, h3, h4, h5, h6, h7 = st.columns([2,2,2,2,1,0.5,0.5])
-# h1.markdown("**Brand**")
-# h2.markdown("**Model**")
-# h3.markdown("**Serial No**")
-# h4.markdown("**Status**")
-# h5.markdown("**Qty**")
-# h6.markdown("**Edit**")
-# h7.markdown("**Delete**")
-
-# st.divider()
-
-# # ==========================
-# # 🔥 FIXED LOOP (NO DUPLICATE KEYS)
-# # ==========================
-# for _, row in list_df.iterrows():
-
-#     uid = str(row["id"])  # ✅ ALWAYS UNIQUE
-
-#     c1, c2, c3, c4, c5, c6, c7 = st.columns([2,2,2,2,1,0.5,0.5])
-
-#     c1.write(row["brand"])
-#     c2.write(row["model"])
-#     c3.write(row["serial_no"])
-#     c4.write(row["status"])
-#     c5.write(row["quantity"])
-
-#     if c6.button("✏️", key=f"edit_{uid}"):   # ✅ FIX HERE
-#         st.session_state.edit_row = row.to_dict()
-#         edit_inventory_dialog()
-
-#     if c7.button("🗑", key=f"del_{uid}"):     # ✅ FIX HERE
-#         delete_inventory(row["serial_no"])
-#         st.warning("Deleted")
-#         st.rerun()
-
 # ==========================
 # LOAD DATA
 # ==========================
@@ -355,7 +273,7 @@ if not df.empty:
     df.columns = df.columns.str.strip().str.lower()
 
 # ==========================
-# METRICS
+# METRICS --
 # ==========================
 total = len(df)
 issued = len(df[df["status"] == "Issued"]) if not df.empty else 0
@@ -371,7 +289,7 @@ c4.metric("Damaged", damaged)
 st.divider()
 
 # ==========================
-# ➕ ADD INVENTORY
+# ➕ ADD INVENTORY -
 # ==========================
 if st.button("➕ Add Inventory"):
     add_inventory_dialog()
@@ -379,7 +297,7 @@ if st.button("➕ Add Inventory"):
 st.divider()
 
 # ==========================
-# 📦 INVENTORY DETAILS
+# 📦 INVENTORY DETAILS--
 # ==========================
 st.subheader("📦 Inventory Details")
 
@@ -399,60 +317,6 @@ st.dataframe(details_df, use_container_width=True, hide_index=True)
 
 st.divider()
 
-# # ==========================
-# # 📋 INVENTORY LIST (EDIT + DELETE)
-# # ==========================
-# st.subheader("📋 Inventory List")
-
-# search2 = st.text_input("Search Inventory List")
-
-# list_df = df.copy()
-
-# if search2:
-#     list_df = list_df[
-#         list_df.apply(
-#             lambda r: r.astype(str).str.contains(search2, case=False, na=False).any(),
-#             axis=1
-#         )
-#     ]
-
-# # headers
-# h1, h2, h3, h4, h5, h6, h7 = st.columns([2,2,2,2,1,0.5,0.5])
-# h1.markdown("**Brand**")
-# h2.markdown("**Model**")
-# h3.markdown("**Serial No**")
-# h4.markdown("**Status**")
-# h5.markdown("**Qty**")
-# h6.markdown("**Edit**")
-# h7.markdown("**Delete**")
-
-# st.divider()
-
-# # ==========================
-# # 🔥 FIXED LOOP (NO DUPLICATE KEYS)
-# # ==========================
-# for _, row in list_df.iterrows():
-
-#     # ✅ ALWAYS UNIQUE KEY (critical fix)
-#     uid = str(row["id"])
-
-#     c1, c2, c3, c4, c5, c6, c7 = st.columns([2,2,2,2,1,0.5,0.5])
-
-#     c1.write(row["brand"])
-#     c2.write(row["model"])
-#     c3.write(row["serial_no"])
-#     c4.write(row["status"])
-#     c5.write(row["quantity"])
-
-#     if c6.button("✏️", key=f"edit_{uid}"):
-#         st.session_state.edit_row = row.to_dict()
-#         edit_inventory_dialog()
-
-#     if c7.button("🗑", key=f"del_{uid}"):
-#         delete_inventory(row["serial_no"])
-#         st.warning("Deleted")
-#         st.rerun()
-
 # ==========================
 # 📋 INVENTORY LIST (EDIT + DELETE)
 # ==========================
@@ -470,84 +334,6 @@ if search2:
         )
     ]
 
-# headers
-# h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14,h15 = st.columns([1.5, 1.5, 1.5, 1.5, 1, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 2, 1.5, 0.5, 0.5])
-# h1.markdown("**Brand**")
-# h2.markdown("**Model**")
-# h3.markdown("**Serial No**")
-# h4.markdown("**Category**")
-# h5.markdown("**Qty**")
-# h6.markdown("**Warranty**")
-# h7.markdown("**Status**")
-# h8.markdown("**Hand Over To**")
-# h9.markdown("**Issue Date**")
-# h10.markdown("**Received From**")
-# h11.markdown("**Return Date**")
-# h12.markdown("**Note**")
-# h13.markdown("**Status-2**")
-# h14.markdown("**Edit**")
-# h15.markdown("**Delete**")
-
-# st.divider()
-
-# # for _, row in list_df.iterrows():
-# #     uid = str(row["id"])
-
-# #     c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15 = st.columns([1.5, 1.5, 1.5, 1.5, 1, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 2, 1.5, 0.5, 0.5])
-
-# #     c1.write(row["brand"])
-# #     c2.write(row["model"])
-# #     c3.write(row["serial_no"])
-# #     c4.write(row["item_category"])
-# #     c5.write(row["quantity"])
-# #     c6.write(row["warranty_status"])
-# #     c7.write(row["status"])
-# #     c8.write(row.get("hand_over_to", ""))
-# #     c9.write(str(row["issue_date"]) if pd.notna(row["issue_date"]) else "—")
-# #     c10.write(row.get("received_from", ""))
-# #     c11.write(str(row["return_date"]) if pd.notna(row["return_date"]) else "—")
-# #     c12.write(row.get("note", ""))
-# #     c13.write(row.get("status_2", ""))
-
-# #     if c14.button("✏️", key=f"edit_{uid}"):
-# #         st.session_state.edit_row = row.to_dict()
-# #         edit_inventory_dialog()
-
-# #     if c15.button("🗑", key=f"del_{uid}"):
-# #         delete_inventory(row["serial_no"])
-# #         st.warning("Deleted")
-# #         st.rerun()
-
-# for _, row in list_df.iterrows():
-#     uid = str(row["id"])
-
-#     c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15 = st.columns([1.5, 1.5, 1.5, 1.5, 1, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 2, 1.5, 0.5, 0.5])
-
-#     def small(val):
-#         return f'<p style="font-size:15px; margin:0">{val}</p>'
-
-#     c1.markdown(small(row["brand"]), unsafe_allow_html=True)
-#     c2.markdown(small(row["model"]), unsafe_allow_html=True)
-#     c3.markdown(small(row["serial_no"]), unsafe_allow_html=True)
-#     c4.markdown(small(row["item_category"]), unsafe_allow_html=True)
-#     c5.markdown(small(row["quantity"]), unsafe_allow_html=True)
-#     c6.markdown(small(row["warranty_status"]), unsafe_allow_html=True)
-#     c7.markdown(small(row["status"]), unsafe_allow_html=True)
-#     c8.markdown(small(row.get("hand_over_to", "")), unsafe_allow_html=True)
-#     c9.markdown(small(str(row["issue_date"]) if pd.notna(row["issue_date"]) else "—"), unsafe_allow_html=True)
-#     c10.markdown(small(row.get("received_from", "")), unsafe_allow_html=True)
-#     c11.markdown(small(str(row["return_date"]) if pd.notna(row["return_date"]) else "—"), unsafe_allow_html=True)
-#     c12.markdown(small(row.get("note", "")), unsafe_allow_html=True)
-#     c13.markdown(small(row.get("status_2", "")), unsafe_allow_html=True)
-
-#     if c14.button("✏️", key=f"edit_{uid}"):
-#         st.session_state.edit_row = row.to_dict()
-#         edit_inventory_dialog()
-
-#     if c15.button("🗑", key=f"del_{uid}"):
-#         delete_inventory(row["serial_no"])
-#         st.warning("Deleted")
-#         st.rerun()
 
 # Change the headers line - add a spacer column
 h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14, h_gap, h15 = st.columns([1.5, 1.5, 1.5, 1.5, 1, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 2, 1.5, 0.5, 0.2, 0.5])
