@@ -103,7 +103,7 @@ The app will open in your browser at `http://localhost:8501`.
 | 📦 Inventory | Add and manage products and stock levels          |
 | 👨‍💼 Employees | View and update employee records                  |
 | 📊 Dashboard | Visualize inventory and employee stats            |
-| 📁 Reports | Analytics and business performance summaries        |
+| 📁 Reports   | Analytics and report summaries                    |
 
 ---
 ## 📄 License
