@@ -266,10 +266,11 @@ The app will open in your browser at `http://localhost:8501`.
 | 🏠 Home           | Welcome dashboard with quick-access cards|
 | 📦 Inventory      | Add and manage products and stock levels |
 | 👨‍💼 Employees    | View and update employee records         |
-<!-- | 📊 Dashboard T1   | Inventory and employee stats (view 1)    |
-| 📊 Dashboard T2   | Inventory and employee stats (view 2)    | -->
 | 📁 Reports        | Analytics and report summaries           |
 
+
+<!-- | 📊 Dashboard T1   | Inventory and employee stats (view 1)    |
+| 📊 Dashboard T2   | Inventory and employee stats (view 2)    | -->
 ---
 
 ## 📄 License
