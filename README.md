@@ -153,11 +153,30 @@ INVENTORY_MGT/
 ├── pages/                          # Streamlit multi-page app pages
 │   ├── 1_Inventory-Section.py      # Inventory management page
 │   ├── 2_Employee-Section.py       # Employee management page
+│   └── 3_Report.py                 # Reports & analytics page
+|
+└── __pycache__/                    # Python bytecode cache (gitignored)
+```
+
+
+<!-- ## 📁 Project Structure
+
+```
+INVENTORY_MGT/
+├── Home.py                         # Main entry point — home dashboard
+├── db_connection.py                # PostgreSQL connection utility
+├── test.py                         # Testing script
+├── .env                            # Environment variables (gitignored)
+├── .gitignore                      # Git ignore rules
+├── README.md                       # Project documentation
+├── pages/                          # Streamlit multi-page app pages
+│   ├── 1_Inventory-Section.py      # Inventory management page
+│   ├── 2_Employee-Section.py       # Employee management page
 │   ├── 3_Dashboard-T1.py           # Dashboard overview (Type 1)
 │   ├── 4_Report.py                 # Reports & analytics page
 │   └── 5_Dashboard-T2.py           # Dashboard overview (Type 2)
 └── __pycache__/                    # Python bytecode cache (gitignored)
-```
+``` -->
 
 <!-- ## 📁 Project Structure -
 
@@ -247,8 +266,8 @@ The app will open in your browser at `http://localhost:8501`.
 | 🏠 Home           | Welcome dashboard with quick-access cards|
 | 📦 Inventory      | Add and manage products and stock levels |
 | 👨‍💼 Employees    | View and update employee records         |
-| 📊 Dashboard T1   | Inventory and employee stats (view 1)    |
-| 📊 Dashboard T2   | Inventory and employee stats (view 2)    |
+<!-- | 📊 Dashboard T1   | Inventory and employee stats (view 1)    |
+| 📊 Dashboard T2   | Inventory and employee stats (view 2)    | -->
 | 📁 Reports        | Analytics and report summaries           |
 
 ---
