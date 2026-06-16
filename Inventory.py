@@ -299,30 +299,30 @@ st.divider()
 # ==========================
 # 📦 INVENTORY DETAILS--
 # ==========================
-st.subheader("📦 Inventory Details")
+# st.subheader("📦 Inventory Details")
 
-search1 = st.text_input("Search Inventory Details")
+# search1 = st.text_input("Search Inventory Details")
 
-details_df = df.copy()
+# details_df = df.copy()
 
-if search1:
-    details_df = details_df[
-        details_df.apply(
-            lambda r: r.astype(str).str.contains(search1, case=False, na=False).any(),
-            axis=1
-        )
-    ]
+# if search1:
+#     details_df = details_df[
+#         details_df.apply(
+#             lambda r: r.astype(str).str.contains(search1, case=False, na=False).any(),
+#             axis=1
+#         )
+#     ]
 
-st.dataframe(details_df, use_container_width=True, hide_index=True)
+# st.dataframe(details_df, use_container_width=True, hide_index=True)
 
-st.divider()
+# st.divider()
 
 # ==========================
 # 📋 INVENTORY LIST (with EDIT + DELETE)
 # ==========================
 st.subheader("📋 Inventory List")
 
-search2 = st.text_input("Search Inventory List")
+search2 = st.text_input("🔍Search Inventory List")
 
 list_df = df.copy()
 
@@ -392,18 +392,10 @@ for _, row in list_df.iterrows():
 
 st.divider()
 
-st.caption("Inventory Management System • Dashboard")
 
 # ----------------------------
 # Footer
 # ----------------------------
-# st.markdown(
-#     """
-#     <div style='text-align:left; color:gray;'>
-#         © 2026 Inventory Management System <br>
-#         Built with ❤️ using Streamlit
-#     </div>
-#     """,
-#     unsafe_allow_html=True
-# )
+st.caption("Inventory Management System • Dashboard")
+
 # ===========================
