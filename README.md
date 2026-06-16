@@ -89,7 +89,7 @@ DB_PORT=5432
 ### 5. Run the Application
 
 ```bash
-streamlit run Home.py
+streamlit run Inventory.py
 ```
 
 The app will open in your browser at `http://localhost:8501`.
