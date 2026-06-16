@@ -1,14 +1,7 @@
 import streamlit as st
 import pandas as pd
 from datetime import date
-import io
 from db_connection import get_connection
-
-from reportlab.lib.pagesizes import landscape, A4
-from reportlab.lib import colors
-from reportlab.lib.units import mm
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
-from reportlab.lib.styles import getSampleStyleSheet
 
 st.set_page_config(page_title="Inventory Section", layout="wide")
 st.title("🏬 Inventory Section")
@@ -92,59 +85,6 @@ def delete_inventory(serial_no):
     conn.commit()
     cur.close()
     conn.close()
-
-# ==========================
-# PDF EXPORT
-# ==========================
-def generate_inventory_pdf(data: pd.DataFrame) -> bytes:
-    buffer = io.BytesIO()
-    doc = SimpleDocTemplate(
-        buffer,
-        pagesize=landscape(A4),
-        leftMargin=10 * mm, rightMargin=10 * mm,
-        topMargin=12 * mm, bottomMargin=12 * mm,
-    )
-    styles = getSampleStyleSheet()
-    elements = []
-
-    elements.append(Paragraph("Inventory Report", styles["Title"]))
-    elements.append(Paragraph(f"Generated on {date.today().strftime('%d-%m-%Y')}", styles["Normal"]))
-    elements.append(Spacer(1, 10))
-
-    columns = [
-        "brand", "model", "serial_no", "item_category", "quantity",
-        "warranty_status", "status", "hand_over_to", "issue_date",
-        "received_from", "return_date", "note", "status_2",
-    ]
-    headers = [
-        "Brand", "Model", "Serial No", "Category", "Qty",
-        "Warranty", "Status", "Handover To", "Issue Date",
-        "Received From", "Return Date", "Note", "Status-2",
-    ]
-
-    table_data = [headers]
-    for _, row in data.iterrows():
-        line = []
-        for col in columns:
-            val = row.get(col, "")
-            line.append(str(val) if pd.notna(val) and val != "" else "—")
-        table_data.append(line)
-
-    table = Table(table_data, repeatRows=1)
-    table.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#2C3E50")),
-        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-        ("FONTSIZE", (0, 0), (-1, -1), 7),
-        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        ("GRID", (0, 0), (-1, -1), 0.4, colors.grey),
-        ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#F4F6F7")]),
-    ]))
-
-    elements.append(table)
-    doc.build(elements)
-    buffer.seek(0)
-    return buffer.getvalue()
 
 # ======================
 # ADD INVENTORY --
@@ -357,14 +297,32 @@ if st.button("➕ Add Inventory"):
 st.divider()
 
 # ==========================
+# 📦 INVENTORY DETAILS--
+# ==========================
+# st.subheader("📦 Inventory Details")
+
+# search1 = st.text_input("Search Inventory Details")
+
+# details_df = df.copy()
+
+# if search1:
+#     details_df = details_df[
+#         details_df.apply(
+#             lambda r: r.astype(str).str.contains(search1, case=False, na=False).any(),
+#             axis=1
+#         )
+#     ]
+
+# st.dataframe(details_df, use_container_width=True, hide_index=True)
+
+# st.divider()
+
+# ==========================
 # 📋 INVENTORY LIST (with EDIT + DELETE)
 # ==========================
 st.subheader("📋 Inventory List")
 
-search_col, dl_col = st.columns([5, 1])
-
-with search_col:
-    search2 = st.text_input("🔍Search Inventory List")
+search2 = st.text_input("🔍Search Inventory List")
 
 list_df = df.copy()
 
@@ -376,15 +334,6 @@ if search2:
         )
     ]
 
-with dl_col:
-    st.markdown("<div style='margin-top:28px'></div>", unsafe_allow_html=True)
-    pdf_bytes = generate_inventory_pdf(list_df)
-    st.download_button(
-        label="📄 Download PDF",
-        data=pdf_bytes,
-        file_name=f"inventory-report_{date.today().strftime('%d-%m-%Y')}.pdf",
-        mime="application/pdf",
-    )
 
 # Change the headers line - add a spacer column
 h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14, h_gap, h15 = st.columns([1.5, 1.5, 1.5, 1.5, 1, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 2, 1.5, 0.7, 0.2, 0.7])
@@ -413,7 +362,7 @@ for _, row in list_df.iterrows():
     # Add h_gap spacer column here too
     c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c_gap, c15 = st.columns([1.5, 1.5, 1.5, 1.5, 1, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 2, 1.5, 0.5, 0.4, 0.5])
 
-    def small(val):
+    def small(val):                                                                                                                                                     
         return f'<p style="font-size:12px; margin:0">{val}</p>'
 
     c1.markdown(small(row["brand"]), unsafe_allow_html=True)
@@ -448,3 +397,5 @@ st.divider()
 # Footer
 # ----------------------------
 st.caption("Inventory Management System • Dashboard")
+
+# ===========================
