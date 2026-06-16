@@ -10,6 +10,9 @@ from reportlab.lib.units import mm
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
 
+# from utils import apply_layout
+# apply_layout()
+
 st.set_page_config(page_title="Inventory Status", layout="wide")
 st.badge("**:material/inventory: Inventory Status**",color='green')
 # st.markdown("### 🏬 **Inventory Status** :green[Active]") 
