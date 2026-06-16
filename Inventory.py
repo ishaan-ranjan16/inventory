@@ -354,7 +354,7 @@ st.divider()
 if st.button("➕ Add Inventory"):
     add_inventory_dialog()
 
-# st.divider()
+st.divider()
 
 # ==========================
 # 📋 INVENTORY LIST (with EDIT + DELETE)
