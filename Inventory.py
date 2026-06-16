@@ -117,7 +117,7 @@ def generate_inventory_pdf(data: pd.DataFrame) -> bytes:
         "received_from", "return_date", "note", "status_2",
     ]
     headers = [
-        "Brand", "Model", "Serial No", "Category", "Qty",
+        "Brand", "Model", "Serial No", "Category", "Quantity",
         "Warranty", "Status", "Handover To", "Issue Date",
         "Received From", "Return Date", "Note", "Status-2",
     ]
@@ -394,7 +394,7 @@ h1.markdown("**Brand**")
 h2.markdown("**Model**")
 h3.markdown("**Serial No**")
 h4.markdown("**Category**")
-h5.markdown("**Qty**")
+h5.markdown("**Quantity**")
 h6.markdown("**Warranty**")
 h7.markdown("**Status**")
 h8.markdown("**Hand Over To**")
