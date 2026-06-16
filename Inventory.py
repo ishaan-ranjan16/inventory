@@ -11,7 +11,7 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, 
 from reportlab.lib.styles import getSampleStyleSheet
 
 st.set_page_config(page_title="Inventory Status", layout="wide")
-st.badge("**:material/inventory: Inventory Status**")
+st.badge("**:material/inventory: Inventory Status**",color='green')
 # st.markdown("### 🏬 **Inventory Status** :green[Active]") 
 # Or using a block background:
 # st.markdown("##🏬 Inventory Status ** :material/inventory:")
@@ -498,22 +498,22 @@ with dl_col:
 
 # Change the headers line - add a spacer column
 h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14, h_gap, h15 = st.columns([1.5, 1.5, 1.5, 1.5, 1, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 2, 1.5, 0.7, 0.2, 0.7])
-h1.write("Brand")
-h2.write("Model")
-h3.write("S No")
-h4.write("Category")
-h5.write("Qty")
-h6.write("Warranty")
-h7.write("Status")
-h8.write("Hand over To")
-h9.write("Issue Date")
-h10.write("Received From")
-h11.write("Return Date")
-h12.write("Note")
-h13.write("Status-2")
-# h14.write("edit")
+h1.badge("Brd.")
+h2.badge("Mod.")
+h3.badge("S.No")
+h4.badge("Category")
+h5.badge("Qty.")
+h6.badge("Wty.")
+h7.badge("Status")
+h8.badge("H/O to.")
+h9.badge("D.O.I.")
+h10.badge("Rec.from")
+h11.badge("D.O.R.")
+h12.badge("Note")
+h13.badge("Status-2")
+# h14.badge("edit")
 # # h_gap is intentionally left empty
-# h15.write("Del.")
+# h15.badge("Del.")
 
 # st.divider()
 
