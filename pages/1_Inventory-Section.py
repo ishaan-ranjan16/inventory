@@ -389,3 +389,5 @@ for _, row in list_df.iterrows():
         delete_inventory(row["serial_no"])
         st.warning("Deleted")
         st.rerun()
+
+    st.divider()
