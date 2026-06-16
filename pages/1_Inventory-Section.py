@@ -336,7 +336,7 @@ if search2:
 
 
 # Change the headers line - add a spacer column
-h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14, h_gap, h15 = st.columns([1.5, 1.5, 1.5, 1.5, 1, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 2, 1.8, 0.7, 0.2, 0.7])
+h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14, h_gap, h15 = st.columns([1.5, 1.5, 1.5, 1.5, 1, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 2, 1.5, 0.7, 0.2, 0.7])
 h1.markdown("**Brand**")
 h2.markdown("**Model**")
 h3.markdown("**Serial No**")
