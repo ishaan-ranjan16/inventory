@@ -354,7 +354,7 @@ st.divider()
 if st.button("➕ Add Inventory"):
     add_inventory_dialog()
 
-st.divider()
+# st.divider()
 
 # ==========================
 # 📋 INVENTORY LIST (with EDIT + DELETE)
@@ -375,6 +375,8 @@ if search2:
             axis=1
         )
     ]
+
+st.divider()
 
 with dl_col:
     st.markdown("<div style='margin-top:28px'></div>", unsafe_allow_html=True)
