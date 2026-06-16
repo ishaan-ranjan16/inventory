@@ -390,4 +390,20 @@ for _, row in list_df.iterrows():
         st.warning("Deleted")
         st.rerun()
 
-    st.divider()
+st.divider()
+
+st.caption("Inventory Management System • Dashboard")
+
+# ----------------------------
+# Footer
+# ----------------------------
+# st.markdown(
+#     """
+#     <div style='text-align:left; color:gray;'>
+#         © 2026 Inventory Management System <br>
+#         Built with ❤️ using Streamlit
+#     </div>
+#     """,
+#     unsafe_allow_html=True
+# )
+# ===========================
