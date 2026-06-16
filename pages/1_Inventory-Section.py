@@ -336,7 +336,7 @@ if search2:
 
 
 # Change the headers line - add a spacer column
-h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14, h_gap, h15 = st.columns([1.5, 1.5, 1.5, 1.5, 1, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 2, 1.5, 0.5, 0.2, 0.5])
+h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14, h_gap, h15 = st.columns([1.5, 1.5, 1.5, 1.5, 1, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 2, 1.8, 0.7, 0.2, 0.7])
 h1.markdown("**Brand**")
 h2.markdown("**Model**")
 h3.markdown("**Serial No**")
@@ -362,7 +362,7 @@ for _, row in list_df.iterrows():
     # Add h_gap spacer column here too
     c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c_gap, c15 = st.columns([1.5, 1.5, 1.5, 1.5, 1, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 2, 1.5, 0.5, 0.4, 0.5])
 
-    def small(val):
+    def small(val):                                                                                                                                                     
         return f'<p style="font-size:12px; margin:0">{val}</p>'
 
     c1.markdown(small(row["brand"]), unsafe_allow_html=True)
