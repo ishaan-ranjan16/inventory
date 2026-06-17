@@ -294,38 +294,6 @@ def edit_inventory_dialog():
         handover = st.text_input("Handover To", value=row.get("hand_over_to", ""))
         received = st.text_input("Received From", value=row.get("received_from", ""))
 
-        # issue_type = st.radio(
-        #     "Issue Date Type",
-        #     ["Date", "NA"],
-        #     horizontal=True,
-        #     index=0 if pd.notna(row["issue_date"]) else 1,
-        #     key=f"issue_{row['id']}"
-        # )
-
-        # issue_date = st.date_input(
-        #     "Issue Date",
-        #     value=safe_date(row["issue_date"]),
-        #     key=f"issue_date_{row['id']}"
-        # )
-
-        # issue_final = issue_date if issue_type == "Date" else None
-
-        # return_type = st.radio(
-        #     "Return Date Type",
-        #     ["Date", "NA"],
-        #     horizontal=True,
-        #     index=0 if pd.notna(row["return_date"]) else 1,
-        #     key=f"return_{row['id']}"
-        # )
-
-        # return_date = st.date_input(
-        #     "Return Date",
-        #     value=safe_date(row["return_date"]),
-        #     key=f"return_date_{row['id']}"
-        # )
-
-        # return_final = return_date if return_type == "Date" else None
-
         issue_type = st.radio(
             "Issue Date Type",
             ["Date", "NA"],
@@ -334,13 +302,13 @@ def edit_inventory_dialog():
             key=f"issue_{row['id']}"
         )
 
-        issue_final = None
-        if issue_type == "Date":
-            issue_final = st.date_input(
-                "Issue Date",
-                value=safe_date(row["issue_date"]),
-                key=f"issue_date_{row['id']}"
-            )
+        issue_date = st.date_input(
+            "Issue Date",
+            value=safe_date(row["issue_date"]),
+            key=f"issue_date_{row['id']}"
+        )
+
+        issue_final = issue_date if issue_type == "Date" else None
 
         return_type = st.radio(
             "Return Date Type",
@@ -350,13 +318,47 @@ def edit_inventory_dialog():
             key=f"return_{row['id']}"
         )
 
-        return_final = None
-        if return_type == "Date":
-            return_final = st.date_input(
-                "Return Date",
-                value=safe_date(row["return_date"]),
-                key=f"return_date_{row['id']}"
-            )
+        return_date = st.date_input(
+            "Return Date",
+            value=safe_date(row["return_date"]),
+            key=f"return_date_{row['id']}"
+        )
+
+        return_final = return_date if return_type == "Date" else None
+
+        #______________________________________________________________
+
+        # issue_type = st.radio(
+        #     "Issue Date Type",
+        #     ["Date", "NA"],
+        #     horizontal=True,
+        #     index=0 if pd.notna(row["issue_date"]) else 1,
+        #     key=f"issue_{row['id']}"
+        # )
+
+        # issue_final = None
+        # if issue_type == "Date":
+        #     issue_final = st.date_input(
+        #         "Issue Date",
+        #         value=safe_date(row["issue_date"]),
+        #         key=f"issue_date_{row['id']}"
+        #     )
+
+        # return_type = st.radio(
+        #     "Return Date Type",
+        #     ["Date", "NA"],
+        #     horizontal=True,
+        #     index=0 if pd.notna(row["return_date"]) else 1,
+        #     key=f"return_{row['id']}"
+        # )
+
+        # return_final = None
+        # if return_type == "Date":
+        #     return_final = st.date_input(
+        #         "Return Date",
+        #         value=safe_date(row["return_date"]),
+        #         key=f"return_date_{row['id']}"
+        #     )
 
         note = st.text_area("📝 Note", value=row.get("note", ""))
 
