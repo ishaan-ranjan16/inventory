@@ -1,3 +1,6 @@
 __pycache__/
 *.pyc
 .env
+
+# Ignore the test script
+test.py
