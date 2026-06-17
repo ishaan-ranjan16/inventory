@@ -447,8 +447,10 @@ with title_col:
     st.badge("**:material/inventory: Overall Inventory Status**", color='green')
 
 with add_col:
-    if st.button("Add Inventory", icon=":material/loupe:", key="add_inv_btn", use_container_width=True):
+    if st.button("Add Inventory", icon=":material/add_box:", key="add_inv_btn", use_container_width=True):
         add_inventory_dialog()
+
+    # loupe
 
 with pdf_col:
     pdf_bytes = generate_inventory_pdf(df)
