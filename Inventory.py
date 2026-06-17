@@ -439,11 +439,10 @@ c2.metric("Issued", issued)
 c3.metric("Available", available)
 c4.metric("Damaged", damaged)
 
-st.divider()
 # ==========================
 # 📋 INVENTORY LIST (search box only — buttons already placed above)
 # ==========================
-st.badge("**📋 Inventory List**", color='orange')
+# st.badge("**📋 Inventory List**", color='orange')
 
 search2 = st.text_input(
     "Search Inventory List",
