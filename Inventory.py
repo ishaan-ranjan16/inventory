@@ -20,6 +20,9 @@ st.set_page_config(page_title="Inventory", layout="wide")
 # ==========================
 st.markdown("""
     <style>
+            html {
+            zoom: 90%;
+        }
         /* Remove the default top padding above your content */
         .block-container {
             padding-top: 1rem;
