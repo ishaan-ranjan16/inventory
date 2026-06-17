@@ -22,7 +22,7 @@ st.markdown("""
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <style>
         html {
-            zoom: 79%;
+            zoom: 80%;
         }
 
         /* Remove the default top padding above your content */
@@ -582,13 +582,21 @@ if search2:
         )
     ]
 
+list_df = list_df.reset_index(drop=True)
+list_df["s_no"] = list_df.index + 1
+
 # column widths — used for BOTH header and data rows
-COL_WIDTHS = [1.3, 1.6, 1.4, 1.5, 1.1, 1.4, 1.3, 1.4, 1.5, 1.7, 1.5, 1.8, 1.4, 0.6, 0.2, 0.6]
+# COL_WIDTHS = [1.3, 1.6, 1.4, 1.5, 1.1, 1.4, 1.3, 1.4, 1.5, 1.7, 1.5, 1.8, 1.4, 0.6, 0.2, 0.6]
+COL_WIDTHS = [0.7, 1.3, 1.6, 1.4, 1.5, 1.1, 1.4, 1.3, 1.4, 1.5, 1.7, 1.5, 1.8, 1.4, 0.6, 0.2, 0.6]
+
 
 # Headers row
 
 with st.container(key="header_row"):
-    h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14, h_gap, h15 = st.columns(COL_WIDTHS)
+    # h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14, h_gap, h15 = st.columns(COL_WIDTHS)
+    h0, h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14, h_gap, h15 = st.columns(COL_WIDTHS)
+
+    h0.badge("SNo")
     h1.badge("Brand")
     h2.badge("Model")
     h3.badge("Serial No.")
@@ -605,10 +613,12 @@ with st.container(key="header_row"):
 
 for _, row in list_df.iterrows():
     uid = str(row["id"])
-    c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c_gap, c15 = st.columns(COL_WIDTHS)
-
+    # c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c_gap, c15 = st.columns(COL_WIDTHS)
+    c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c_gap, c14, c15 = st.columns(COL_WIDTHS)
     def small(val):
         return f'<p style="font-size:12px; margin:0">{val}</p>'
+
+    c0.markdown(small(row["s_no"]), unsafe_allow_html=True)
 
     c1.markdown(small(row["brand"]), unsafe_allow_html=True)
     c2.markdown(small(row["model"]), unsafe_allow_html=True)
