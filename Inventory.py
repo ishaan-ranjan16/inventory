@@ -21,12 +21,12 @@ st.set_page_config(page_title="Inventory", layout="wide")
 st.markdown("""
     <style>
             html {
-            zoom: 90%;
+            zoom: 79%;
         }
         /* Remove the default top padding above your content */
         .block-container {
-            padding-top: 1rem;
-            padding-bottom: 1rem;
+            padding-top: 0rem;
+            padding-bottom: 0rem;
         }
 
         /* Hide the Streamlit header bar entirely (hamburger menu, deploy button) */
@@ -406,19 +406,38 @@ if not df.empty:
 # ==========================
 # TOP HEADER ROW — title (left) + Add Inventory , Download PDF (right)
 # ==========================
-title_col, add_col, pdf_col = st.columns([6, 1.3, 1.3])
+
+# st.markdown(
+#     """
+#     <style>
+#     /* Target both regular buttons and download buttons */
+#     div.stButton > button, div.stDownloadButton > button {
+#         height: 38px;          /* Forces an identical, compact height */
+#         padding-top: 0px;      /* Tightens internal vertical spacing */
+#         padding-bottom: 0px;
+#     }
+#     </style>
+#     """,
+#     unsafe_html=True
+# )
+
+
+
+# title_col, add_col, pdf_col = st.columns([6, 1.3, 1.3])
+title_col, add_col, pdf_col = st.columns([1,0.05,0.05])  # Adjusted column widths for better alignment
 
 with title_col:
     st.badge("**:material/inventory: Inventory Status**", color='green')
 
 with add_col:
-    if st.button("➕ Add Inventory", use_container_width=True):
+    if st.button("➕ Add", use_container_width=True):
         add_inventory_dialog()
 
 with pdf_col:
     pdf_bytes = generate_inventory_pdf(df)
     st.download_button(
-        label="📄 Download PDF",
+        # label="📄 Download",
+        label="📄PDF",
         data=pdf_bytes,
         file_name=f"inventory-report_{date.today().strftime('%d-%m-%Y')}.pdf",
         mime="application/pdf",
@@ -473,12 +492,12 @@ h2.badge("Model")
 h3.badge("S.No")
 h4.badge("Category")
 h5.badge("Qty")
-h6.badge("Wty.")
+h6.badge("Warranty")
 h7.badge("Status")
-h8.badge("H/O.to")
-h9.badge("Issue D.")
-h10.badge("Rec. From")
-h11.badge("Return D.")
+h8.badge("Hand Over To")
+h9.badge("Issue Date")
+h10.badge("Received From")
+h11.badge("Return Date")
 h12.badge("Note")
 h13.badge("Status-2")
 
