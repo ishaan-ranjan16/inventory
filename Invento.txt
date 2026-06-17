@@ -4,8 +4,6 @@ from datetime import date
 import io
 from db_connection import get_connection
 
-from datetime import datetime
-
 from reportlab.lib.pagesizes import landscape, A4
 from reportlab.lib import colors
 from reportlab.lib.units import mm
@@ -14,10 +12,11 @@ from reportlab.lib.styles import getSampleStyleSheet
 
 
 st.set_page_config(page_title="Inventory Status", layout="wide")
+st.badge("**:material/inventory: Inventory Status**",color='green')
 
-# ==========================
-# GLOBAL STYLE — remove top padding / hide default header
-# ==========================
+        
+import streamlit as st
+
 st.markdown("""
     <style>
         /* Remove the default top padding above your content */
@@ -35,16 +34,8 @@ st.markdown("""
         [data-testid="stDecoration"] {
             display: none;
         }
-
-        div[data-testid="stMetricValue"] {
-            font-size: 15px;
-        }
-        div[data-testid="stMetricLabel"] {
-            font-size: 13px;
-        }
     </style>
 """, unsafe_allow_html=True)
-
 # ==========================
 # SESSION STATE
 # ==========================
@@ -140,8 +131,7 @@ def generate_inventory_pdf(data: pd.DataFrame) -> bytes:
     elements = []
 
     elements.append(Paragraph("Inventory Report", styles["Title"]))
-    # elements.append(Paragraph(f"Generated on {date.today().strftime('%d-%m-%Y')}", styles["Normal"]))
-    elements.append(Paragraph(f"Generated on {datetime.now().strftime('%d-%m-%Y %I:%M:%S %p')}", styles["Normal"]))
+    elements.append(Paragraph(f"Generated on {date.today().strftime('%d-%m-%Y')}", styles["Normal"]))
     elements.append(Spacer(1, 10))
 
     columns = [
@@ -180,7 +170,7 @@ def generate_inventory_pdf(data: pd.DataFrame) -> bytes:
     return buffer.getvalue()
 
 # ======================
-# ADD INVENTORY
+# ADD INVENTORY --
 # ======================
 @st.dialog("📝 Add Inventory")
 def add_inventory_dialog():
@@ -251,7 +241,7 @@ def add_inventory_dialog():
             st.rerun()
 
 # ==========================
-# EDIT INVENTORY
+# EDIT INVENTORY -
 # ==========================
 @st.dialog("✏️ Edit Inventory")
 def edit_inventory_dialog():
@@ -295,7 +285,7 @@ def edit_inventory_dialog():
             "Issue Date Type",
             ["Date", "NA"],
             horizontal=True,
-            key=f"issue_{row['id']}"
+            key=f"issue_{row['id']}"   # ✅ FIX: use id NOT serial_no
         )
 
         issue_date = st.date_input(
@@ -310,7 +300,7 @@ def edit_inventory_dialog():
             "Return Date Type",
             ["Date", "NA"],
             horizontal=True,
-            key=f"return_{row['id']}"
+            key=f"return_{row['id']}"   # ✅ FIX
         )
 
         return_date = st.date_input(
@@ -324,6 +314,7 @@ def edit_inventory_dialog():
         note = st.text_area("📝 Note", value=row.get("note", ""))
 
         status_2 = st.text_input("Status-2", value=row.get("status_2", ""))
+
 
         c1, c2 = st.columns(2)
 
@@ -364,35 +355,31 @@ df = fetch_inventory()
 if not df.empty:
     df.columns = df.columns.str.strip().str.lower()
 
-# ==========================
-# TOP HEADER ROW — title (left) + Add Inventory , Download PDF (right)
-# ==========================
-title_col, add_col, pdf_col = st.columns([6, 1.3, 1.3])
 
-with title_col:
-    st.badge("**:material/inventory: Inventory Status**", color='green')
 
-with add_col:
-    if st.button("➕ Add Inventory", use_container_width=True):
-        add_inventory_dialog()
-
-with pdf_col:
-    pdf_bytes = generate_inventory_pdf(df)
-    st.download_button(
-        label="📄 Download PDF",
-        data=pdf_bytes,
-        file_name=f"inventory-report_{date.today().strftime('%d-%m-%Y')}.pdf",
-        mime="application/pdf",
-        use_container_width=True,
-    )
+# col_spacer, col_btn = st.columns([6.3, 1])
+# with col_btn:
+#     if st.button("➕ Add Inventory"):
+#         add_inventory_dialog() 
 
 # ==========================
-# METRICS
+# METRICS --
 # ==========================
 total = len(df)
 issued = len(df[df["status"] == "Issued"]) if not df.empty else 0
 available = len(df[df["status"] == "In-Inventory"]) if not df.empty else 0
 damaged = len(df[df["status"] == "Damaged"]) if not df.empty else 0
+
+st.markdown("""
+<style>
+div[data-testid="stMetricValue"] {
+    font-size: 15px;
+}
+div[data-testid="stMetricLabel"] {
+    font-size: 13px;
+}
+</style>
+""", unsafe_allow_html=True)
 
 c1, c2, c3, c4 = st.columns(4)
 c1.metric("Total", total)
@@ -400,17 +387,110 @@ c2.metric("Issued", issued)
 c3.metric("Available", available)
 c4.metric("Damaged", damaged)
 
-st.divider()
+
+# st.divider()
+
 # ==========================
-# 📋 INVENTORY LIST (search box only — buttons already placed above)
+# ➕ ADD INVENTORY -
+# ==========================
+col_spacer, col_btn = st.columns([6.1, 1])
+with col_btn:
+    if st.button("➕ Add Inventory"):
+        add_inventory_dialog()
+
+# # ==========================
+# # 📋 INVENTORY LIST (with EDIT + DELETE)
+# # ==========================
+# st.badge("**📋 Inventory List**",color='orange')
+
+# search_col, dl_col = st.columns([3, 1])
+
+# # with search_col:
+# #     search2 = st.text_input("🔍Search Inventory List")
+# with search_col:
+#     search2 = st.text_input(
+#         "Search Inventory List",
+#         placeholder="🔍 Search....",
+#         label_visibility="collapsed"
+#     )
+
+# list_df = df.copy()
+
+# if search2:
+#     list_df = list_df[
+#         list_df.apply(
+#             lambda r: r.astype(str).str.contains(search2, case=False, na=False).any(),
+#             axis=1
+#         )
+#     ]
+
+# # st.divider()
+
+# # with dl_col:
+# #     st.markdown("<div style='margin-top:28px'></div>", unsafe_allow_html=True)
+# #     pdf_bytes = generate_inventory_pdf(list_df)
+# #     st.download_button(
+# #         label="📄 Download PDF",
+# #         data=pdf_bytes,
+# #         file_name=f"inventory-report_{date.today().strftime('%d-%m-%Y')}.pdf",
+# #         mime="application/pdf",
+# #     )
+
+# with dl_col:
+#     st.markdown("<div style='margin-top:2px'></div>", unsafe_allow_html=True)  # tweak this value (try 0, 2, 4px)
+#     pdf_bytes = generate_inventory_pdf(list_df)
+#     st.download_button(
+#         label="📄 Download PDF",
+#         data=pdf_bytes,
+#         file_name=f"inventory-report_{date.today().strftime('%d-%m-%Y')}.pdf",
+#         mime="application/pdf",
+#     )
+# col_spacer, col_btn = st.columns([6.3, 1])
+# with col_btn:
+#     if st.button("➕ Add Inventory"):
+#         add_inventory_dialog()
+
+# ==========================
+# 📋 INVENTORY LIST (with EDIT + DELETE)
 # ==========================
 st.badge("**📋 Inventory List**", color='orange')
 
-search2 = st.text_input(
-    "Search Inventory List",
-    placeholder="🔍 Search....",
-    label_visibility="collapsed"
-)
+# search_col, dl_col, end_spacer = st.columns([4, 2, 4])
+
+# with search_col:
+#     search2 = st.text_input(
+#         "Search Inventory List",
+#         placeholder="🔍 Search....",
+#         label_visibility="collapsed"
+#     )
+
+# list_df = df.copy()
+
+# if search2:
+#     list_df = list_df[
+#         list_df.apply(
+#             lambda r: r.astype(str).str.contains(search2, case=False, na=False).any(),
+#             axis=1
+#         )
+#     ]
+
+# with dl_col:
+#     pdf_bytes = generate_inventory_pdf(list_df)
+#     st.download_button(
+#         label="📄 Download PDF",
+#         data=pdf_bytes,
+#         file_name=f"inventory-report_{date.today().strftime('%d-%m-%Y')}.pdf",
+#         mime="application/pdf",
+#     )
+
+    # search_col, dl_col = st.columns([6.3, 1])
+search_col, end_spacer, dl_col = st.columns([14.3, 0.1, 2.5])
+with search_col:
+    search2 = st.text_input(
+        "Search Inventory List",
+        placeholder="🔍 Search....",
+        label_visibility="collapsed"
+    )
 
 list_df = df.copy()
 
@@ -422,138 +502,41 @@ if search2:
         )
     ]
 
-# # Headers row
-# h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14, h_gap, h15 = st.columns(
-#     [1.5, 1.5, 1.2, 1.5, 1.7, 1.7, 1.8, 2.1, 1.8, 1.8, 1.5, 2, 1.5, 0.7, 0.2, 0.7]
-# )
-# h1.badge("Brand")
-# h2.badge("Model")
-# h3.badge("S.No")
-# h4.badge("Item")
-# h5.badge("Qty.")
-# h6.badge("Wty.")
-# h7.badge("Status")
-# h8.badge("Handover to")
-# h9.badge("Issue Date")
-# h10.badge("Received From")
-# h11.badge("Return Date")
-# h12.badge("Note")
-# h13.badge("Status-2")
+with dl_col:
+    pdf_bytes = generate_inventory_pdf(list_df)
+    st.download_button(
+        label="📄 Download PDF",
+        data=pdf_bytes,
+        file_name=f"inventory-report_{date.today().strftime('%d-%m-%Y')}.pdf",
+        mime="application/pdf",
+    )
 
-# for _, row in list_df.iterrows():
-#     uid = str(row["id"])
-
-#     c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c_gap, c15 = st.columns(
-#         [1.5, 1.5, 1.5, 1.5, 1, 1.2, 1.8, 2.1, 1.8, 1.8, 1.5, 2, 1.5, 0.7, 0.2, 0.7]
-#     )
-
-#     def small(val):
-#         return f'<p style="font-size:12px; margin:0">{val}</p>'
-
-#     c1.markdown(small(row["brand"]), unsafe_allow_html=True)
-#     c2.markdown(small(row["model"]), unsafe_allow_html=True)
-#     c3.markdown(small(row["serial_no"]), unsafe_allow_html=True)
-#     c4.markdown(small(row["item_category"]), unsafe_allow_html=True)
-#     c5.markdown(small(row["quantity"]), unsafe_allow_html=True)
-#     c6.markdown(small(row["warranty_status"]), unsafe_allow_html=True)
-#     c7.markdown(small(row["status"]), unsafe_allow_html=True)
-#     c8.markdown(small(row.get("hand_over_to", "")), unsafe_allow_html=True)
-#     c9.markdown(small(str(row["issue_date"]) if pd.notna(row["issue_date"]) else "—"), unsafe_allow_html=True)
-#     c10.markdown(small(row.get("received_from", "")), unsafe_allow_html=True)
-#     c11.markdown(small(str(row["return_date"]) if pd.notna(row["return_date"]) else "—"), unsafe_allow_html=True)
-#     c12.markdown(small(row.get("note", "")), unsafe_allow_html=True)
-#     c13.markdown(small(row.get("status_2", "")), unsafe_allow_html=True)
-
-#     if c14.button("✏️", key=f"edit_{uid}"):
-#         st.session_state.edit_row = row.to_dict()
-#         edit_inventory_dialog()
-
-#     if c15.button("🗑", key=f"del_{uid}"):
-#         delete_inventory(row["serial_no"])
-#         st.warning("Deleted")
-#         st.rerun()
-
-
-# st.markdown("""
-#     <style>
-#         div[data-testid="stBadge"] {
-#             padding-left: 2px !important;
-#             margin-left: 0px !important;
-#         }
-#     </style>
-# """, unsafe_allow_html=True)
-
-#column widths — used for BOTH header and data rows
-COL_WIDTHS = [1.6, 1.6, 1.4, 1.5, 1.3, 1.5, 1.3, 1.6, 1.5, 1.6, 1.5, 2.0, 1.3, 0.8, 0.05, 0.15]
-
-# # Headers row
-# h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14, h_gap, h15 = st.columns(COL_WIDTHS)
-# h1.badge("Brand")
-# h2.badge("Model")
-# h3.badge("S.No")
-# h4.badge("Category")
-# h5.badge("Qty.")
-# h6.badge("Wty.")
-# h7.badge("Status")
-# h8.badge("H/O to")
-# h9.badge("Issue Date")
-# h10.badge("Rec. From")
-# h11.badge("Return Date")
-# h12.badge("Note")
-# h13.badge("Status-2")
-
-# for _, row in list_df.iterrows():
-#     uid = str(row["id"])
-
-#     c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c_gap, c15 = st.columns(COL_WIDTHS)
-
-
-
-
-# COL_WIDTHS = [1.3, 1.6, 1.4, 1.6, 1.3, 1.5, 1.3, 1.5, 1.4, 1.6, 1.4, 1.0, 1.6, 1, 0.2, 0.7]
-
-COL_WIDTHS = [1.3, 1.6, 1.4, 1.5, 0.9, 1.4, 1.3, 1.4, 1.5, 1.5, 1.5, 1.8, 1.4, 0.6, 0.2, 0.6]
-
-# # Headers row
-# h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14, h_gap, h15 = st.columns(COL_WIDTHS)
-# h1.badge("Brand")
-# h2.badge("Model")
-# h3.badge("S.No")
-# h4.badge("Category")
-# h5.badge("Qty.")
-# h6.badge("Wty.")
-# h7.badge("Status")
-# h8.badge("H/O to")
-# h9.badge("Issue Date")
-# h10.badge("Rec. From")
-# h11.badge("Return Date")
-# h12.badge("Note")
-# h13.badge("Status-2")
-
-# for _, row in list_df.iterrows():
-#     uid = str(row["id"])
-
-#     c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c_gap, c15 = st.columns(COL_WIDTHS)
-
-h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14, h_gap, h15 = st.columns(COL_WIDTHS)
-h1.badge("Brand")
-h2.badge("Model")
+# Change the headers line - add a spacer column
+h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14, h_gap, h15 = st.columns([1.5, 1.5, 1.5, 1.5, 1, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 2, 1.5, 0.7, 0.2, 0.7])
+h1.badge("Brd.")
+h2.badge("Mod.")
 h3.badge("S.No")
 h4.badge("Category")
-h5.badge("Qty")
+h5.badge("Qty.")
 h6.badge("Wty.")
 h7.badge("Status")
-h8.badge("H/O.to")
-h9.badge("Issue D.")
-h10.badge("Rec. From")
-h11.badge("Return D.")
+h8.badge("H/O to.")
+h9.badge("D.O.I.")
+h10.badge("Rec.from")
+h11.badge("D.O.R.")
 h12.badge("Note")
 h13.badge("Status-2")
+# h14.badge("edit")
+# # h_gap is intentionally left empty
+# h15.badge("Del.")
+
+# st.divider()
 
 for _, row in list_df.iterrows():
     uid = str(row["id"])
-    c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c_gap, c15 = st.columns(COL_WIDTHS)
-    # ...
+
+    # Add h_gap spacer column here too
+    c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c_gap, c15 = st.columns([1.5, 1.5, 1.5, 1.5, 1, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 2, 1.5, 0.5, 0.4, 0.5])
 
     def small(val):
         return f'<p style="font-size:12px; margin:0">{val}</p>'
@@ -576,12 +559,15 @@ for _, row in list_df.iterrows():
         st.session_state.edit_row = row.to_dict()
         edit_inventory_dialog()
 
+    # c_gap is left empty — acts as spacer
+
     if c15.button("🗑", key=f"del_{uid}"):
         delete_inventory(row["serial_no"])
         st.warning("Deleted")
         st.rerun()
 
 st.divider()
+
 
 # ----------------------------
 # Footer
