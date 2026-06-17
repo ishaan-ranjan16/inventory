@@ -484,57 +484,14 @@ if search2:
 # """, unsafe_allow_html=True)
 
 #column widths — used for BOTH header and data rows
-COL_WIDTHS = [1.6, 1.6, 1.4, 1.5, 1.3, 1.5, 1.3, 1.6, 1.5, 1.6, 1.5, 2.0, 1.3, 0.8, 0.05, 0.15]
-
-# # Headers row
-# h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14, h_gap, h15 = st.columns(COL_WIDTHS)
-# h1.badge("Brand")
-# h2.badge("Model")
-# h3.badge("S.No")
-# h4.badge("Category")
-# h5.badge("Qty.")
-# h6.badge("Wty.")
-# h7.badge("Status")
-# h8.badge("H/O to")
-# h9.badge("Issue Date")
-# h10.badge("Rec. From")
-# h11.badge("Return Date")
-# h12.badge("Note")
-# h13.badge("Status-2")
-
-# for _, row in list_df.iterrows():
-#     uid = str(row["id"])
-
-#     c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c_gap, c15 = st.columns(COL_WIDTHS)
+# COL_WIDTHS = [1.6, 1.6, 1.4, 1.5, 1.3, 1.5, 1.3, 1.6, 1.5, 1.6, 1.5, 2.0, 1.3, 0.8, 0.05, 0.15]
 
 
 
-
-# COL_WIDTHS = [1.3, 1.6, 1.4, 1.6, 1.3, 1.5, 1.3, 1.5, 1.4, 1.6, 1.4, 1.0, 1.6, 1, 0.2, 0.7]
 
 COL_WIDTHS = [1.3, 1.6, 1.4, 1.5, 0.9, 1.4, 1.3, 1.4, 1.5, 1.5, 1.5, 1.8, 1.4, 0.6, 0.2, 0.6]
 
-# # Headers row
-# h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14, h_gap, h15 = st.columns(COL_WIDTHS)
-# h1.badge("Brand")
-# h2.badge("Model")
-# h3.badge("S.No")
-# h4.badge("Category")
-# h5.badge("Qty.")
-# h6.badge("Wty.")
-# h7.badge("Status")
-# h8.badge("H/O to")
-# h9.badge("Issue Date")
-# h10.badge("Rec. From")
-# h11.badge("Return Date")
-# h12.badge("Note")
-# h13.badge("Status-2")
-
-# for _, row in list_df.iterrows():
-#     uid = str(row["id"])
-
-#     c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c_gap, c15 = st.columns(COL_WIDTHS)
-
+# Headers row
 h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14, h_gap, h15 = st.columns(COL_WIDTHS)
 h1.badge("Brand")
 h2.badge("Model")
