@@ -422,71 +422,8 @@ if search2:
         )
     ]
 
-# # Headers row
-# h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14, h_gap, h15 = st.columns(
-#     [1.5, 1.5, 1.2, 1.5, 1.7, 1.7, 1.8, 2.1, 1.8, 1.8, 1.5, 2, 1.5, 0.7, 0.2, 0.7]
-# )
-# h1.badge("Brand")
-# h2.badge("Model")
-# h3.badge("S.No")
-# h4.badge("Item")
-# h5.badge("Qty.")
-# h6.badge("Wty.")
-# h7.badge("Status")
-# h8.badge("Handover to")
-# h9.badge("Issue Date")
-# h10.badge("Received From")
-# h11.badge("Return Date")
-# h12.badge("Note")
-# h13.badge("Status-2")
-
-# for _, row in list_df.iterrows():
-#     uid = str(row["id"])
-
-#     c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c_gap, c15 = st.columns(
-#         [1.5, 1.5, 1.5, 1.5, 1, 1.2, 1.8, 2.1, 1.8, 1.8, 1.5, 2, 1.5, 0.7, 0.2, 0.7]
-#     )
-
-#     def small(val):
-#         return f'<p style="font-size:12px; margin:0">{val}</p>'
-
-#     c1.markdown(small(row["brand"]), unsafe_allow_html=True)
-#     c2.markdown(small(row["model"]), unsafe_allow_html=True)
-#     c3.markdown(small(row["serial_no"]), unsafe_allow_html=True)
-#     c4.markdown(small(row["item_category"]), unsafe_allow_html=True)
-#     c5.markdown(small(row["quantity"]), unsafe_allow_html=True)
-#     c6.markdown(small(row["warranty_status"]), unsafe_allow_html=True)
-#     c7.markdown(small(row["status"]), unsafe_allow_html=True)
-#     c8.markdown(small(row.get("hand_over_to", "")), unsafe_allow_html=True)
-#     c9.markdown(small(str(row["issue_date"]) if pd.notna(row["issue_date"]) else "—"), unsafe_allow_html=True)
-#     c10.markdown(small(row.get("received_from", "")), unsafe_allow_html=True)
-#     c11.markdown(small(str(row["return_date"]) if pd.notna(row["return_date"]) else "—"), unsafe_allow_html=True)
-#     c12.markdown(small(row.get("note", "")), unsafe_allow_html=True)
-#     c13.markdown(small(row.get("status_2", "")), unsafe_allow_html=True)
-
-#     if c14.button("✏️", key=f"edit_{uid}"):
-#         st.session_state.edit_row = row.to_dict()
-#         edit_inventory_dialog()
-
-#     if c15.button("🗑", key=f"del_{uid}"):
-#         delete_inventory(row["serial_no"])
-#         st.warning("Deleted")
-#         st.rerun()
-
-
-# st.markdown("""
-#     <style>
-#         div[data-testid="stBadge"] {
-#             padding-left: 2px !important;
-#             margin-left: 0px !important;
-#         }
-#     </style>
-# """, unsafe_allow_html=True)
-
 #column widths — used for BOTH header and data rows
 # COL_WIDTHS = [1.6, 1.6, 1.4, 1.5, 1.3, 1.5, 1.3, 1.6, 1.5, 1.6, 1.5, 2.0, 1.3, 0.8, 0.05, 0.15]
-
-
 
 
 COL_WIDTHS = [1.3, 1.6, 1.4, 1.5, 0.9, 1.4, 1.3, 1.4, 1.5, 1.5, 1.5, 1.8, 1.4, 0.6, 0.2, 0.6]
@@ -532,6 +469,9 @@ for _, row in list_df.iterrows():
     if c14.button("✏️", key=f"edit_{uid}"):
         st.session_state.edit_row = row.to_dict()
         edit_inventory_dialog()
+        st.rerun()  # Refresh the page after editing
+
+        # 🗑️
 
     if c15.button("🗑", key=f"del_{uid}"):
         delete_inventory(row["serial_no"])
