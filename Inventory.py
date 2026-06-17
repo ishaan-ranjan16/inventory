@@ -10,8 +10,6 @@ from reportlab.lib.units import mm
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
 
-# from utils import apply_layout
-# apply_layout()
 
 st.set_page_config(page_title="Inventory Status", layout="wide")
 st.badge("**:material/inventory: Inventory Status**",color='green')
@@ -24,6 +22,28 @@ st.badge("**:material/inventory: Inventory Status**",color='green')
 #     if st.button("➕ Add Inventory"):
 #         add_inventory_dialog() 
         
+
+import streamlit as st
+
+st.markdown("""
+    <style>
+        /* Remove the default top padding above your content */
+        .block-container {
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+
+        /* Hide the Streamlit header bar entirely (hamburger menu, deploy button) */
+        header[data-testid="stHeader"] {
+            display: none;
+        }
+
+        /* Hide the colored decoration line under the header */
+        [data-testid="stDecoration"] {
+            display: none;
+        }
+    </style>
+""", unsafe_allow_html=True)
 # ==========================
 # SESSION STATE
 # ==========================
