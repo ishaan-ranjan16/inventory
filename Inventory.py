@@ -548,7 +548,7 @@ with excel_col:
         data=excel_bytes,
         file_name=f"inventory-report_{date.today().strftime('%d-%m-%Y')}.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        use_container_width=True,
+        use_container_width=True,,
         key="excel_btn",
     )
 
