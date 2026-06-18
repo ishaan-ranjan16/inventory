@@ -1,3 +1,5 @@
+from ast import In
+
 import streamlit as st
 import pandas as pd
 from datetime import date
@@ -288,21 +290,26 @@ def add_inventory_dialog():
 
     with st.form("add_form", clear_on_submit=True):
 
-        brand = st.selectbox("Brand", ["Dell", "Lenovo", "HP"])
-        category = st.selectbox("Category", ["Laptop"])
+        # brand = st.selectbox("Brand", ["Dell", "Lenovo", "HP"])
+        brand = st.text_input("Brand")
+        # category = st.selectbox("Category", ["Laptop"])
+        category = st.text_input("Category")
 
         model = st.text_input("Model")
         serial_no = st.text_input("Serial Number")
 
-        warranty = st.selectbox(
-            "Warranty Status",
-            ["Under Warranty", "Warranty Period Over", "NA"]
-        )
+        # warranty = st.selectbox(
+        #     "Warranty Status",
+        #     ["Under Warranty", "Warranty Period Over", "NA"]
+        # )
+        qty = st.number_input("Quantity", value=1, min_value=1)
+        warranty = st.text_input("Warranty Status")
 
-        status = st.selectbox(
-            "Status",
-            ["In-Inventory", "Issued", "Damaged"]
-        )
+        # status = st.selectbox(
+        #     "Status",
+        #     ["In-Inventory", "Issued", "Damaged"]
+        # )
+        status = st.text_input("Status")
 
         handover = st.text_input("Handover To")
         received_from = st.text_input("Received From")
@@ -342,7 +349,7 @@ def add_inventory_dialog():
             insert_inventory(
                 (
                     brand, model, serial_no, category,
-                    warranty, 1, status,
+                    warranty, qty, status,
                     handover, issue_date,
                     received_from, return_date,
                     note, status_2
@@ -361,11 +368,12 @@ def edit_inventory_dialog():
 
     with st.form("edit_form"):
 
-        brand = st.selectbox(
-            "Brand",
-            ["Dell", "Lenovo", "HP"],
-            index=["Dell", "Lenovo", "HP"].index(row["brand"])
-        )
+        # brand = st.selectbox(
+        #     "Brand",
+        #     ["Dell", "Lenovo", "HP"],
+        #     index=["Dell", "Lenovo", "HP"].index(row["brand"])
+        # )
+        brand = st.text_input("Brand", value=row["brand"])
 
         model = st.text_input("Model", value=row["model"])
         serial = st.text_input("Serial No", value=row["serial_no"])
@@ -373,21 +381,26 @@ def edit_inventory_dialog():
 
         qty = st.number_input(
             "Quantity",
-            value=int(row["quantity"]),
+            value=int(row["quantity"]), 
+            # if pd.notna(row["quantity"]) else 1,
             min_value=1
         )
+        # qty = st.text_input("Quantity", value=str(row["quantity"]))
 
-        warranty = st.selectbox(
-            "Warranty Status",
-            ["Under Warranty", "Warranty Period Over", "NA"],
-            index=["Under Warranty", "Warranty Period Over", "NA"].index(row["warranty_status"])
-        )
+        # warranty = st.selectbox(
+        #     "Warranty Status",
+        #     ["Under Warranty", "Warranty Period Over", "NA"],
+        #     index=["Under Warranty", "Warranty Period Over", "NA"].index(row["warranty_status"])
+        # )
+        warranty = st.text_input("Warranty Status", value=row["warranty_status"])
 
-        status = st.selectbox(
-            "Status",
-            ["In-Inventory", "Issued", "Damaged"],
-            index=["In-Inventory", "Issued", "Damaged"].index(row["status"])
-        )
+        # status = st.selectbox(
+        #     "Status",
+        #     ["In-Inventory", "Issued", "Damaged"],
+        #     index=["In-Inventory", "Issued", "Damaged"].index(row["status"])
+        # )
+
+        status = st.text_input("Status", value=row["status"])
 
         handover = st.text_input("Handover To", value=row.get("hand_over_to", ""))
         received = st.text_input("Received From", value=row.get("received_from", ""))
@@ -498,7 +511,7 @@ with excel_col:
     excel_bytes = generate_inventory_excel(df)
     st.download_button(
         # label=":green-badge[:material/description:] Download Excel",
-        label=":material/download: Download Excel",
+        label=":material/description: Download Excel",
         data=excel_bytes,
         file_name=f"inventory-report_{date.today().strftime('%d-%m-%Y')}.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -509,17 +522,31 @@ with excel_col:
 # ==========================
 # METRICS
 # ==========================
-total = len(df)
-issued = len(df[df["status"] == "Issued"]) if not df.empty else 0
-available = len(df[df["status"] == "In-Inventory"]) if not df.empty else 0
-damaged = len(df[df["status"] == "Damaged"]) if not df.empty else 0
+# total = len(df)
+# Issued = len(df[df["status"] == "Issued"]) if not df.empty else 0
+# Available = len(df[df["status"] == "In-Inventory"]) if not df.empty else 0
+# Damaged = len(df[df["status"] == "Damaged"]) if not df.empty else 0
 
+# with st.container(key="metrics_row"):
+#     c1, c2, c3, c4 = st.columns(4)
+#     c1.metric("Total", total)
+#     c2.metric("Issued", Issued)
+#     c3.metric("In-Inventory", Available)
+#     c4.metric("Damaged", Damaged)
+
+total = len(df)
+Issued = len(df[df["status"] == "Issued"])
+Available = len(df[df["status"] == "In-Inventory"])
+Damaged = len(df[df["status"] == "Damaged"])
+
+# Displaying in Streamlit
 with st.container(key="metrics_row"):
     c1, c2, c3, c4 = st.columns(4)
+
     c1.metric("Total", total)
-    c2.metric("Issued", issued)
-    c3.metric("Available", available)
-    c4.metric("Damaged", damaged)
+    c2.metric("Issued", Issued)
+    c3.metric("In-Inventory", Available)
+    c4.metric("Damaged", Damaged)
 
 # ==========================
 # 📋 INVENTORY LIST (search box + refresh button)
@@ -542,7 +569,7 @@ with search_col:
     )
 
 with refresh_col:
-    if st.button(":material/refresh: Refresh", key="refresh_btn", use_container_width=True):
+    if st.button(":material/refresh:", key="refresh_btn", use_container_width=True):
         st.session_state.do_clear_search = True
         st.rerun()
 
