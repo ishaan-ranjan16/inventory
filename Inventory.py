@@ -674,7 +674,6 @@ for _, row in list_df.iterrows():
                 return "—"
             return val
 
-
         # c0.markdown(small(row["s_no"]), unsafe_allow_html=True)
         # c1.markdown(small(row["brand"]), unsafe_allow_html=True)
         # c2.markdown(small(row["model"]), unsafe_allow_html=True)
