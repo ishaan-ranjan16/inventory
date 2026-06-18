@@ -24,7 +24,7 @@ st.markdown("""
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <style>
         html {
-            zoom: 71%;
+            zoom: 72%;
         }
 
         /* Remove the default top padding above your content */
@@ -591,7 +591,7 @@ if st.session_state.get("do_clear_search"):
 
 COL_WIDTHS = [0.7, 0.8, 1.2, 1.0, 0.9, 0.9, 1.3, 1.2, 1.3, 1.1, 1.5, 1.3, 1.6, 1.2, 0.6, 0.6]
 
-SEARCH_ROW_WIDTHS = [sum(COL_WIDTHS[:14]), sum(COL_WIDTHS[14:])]  # [18.0, 1.2]
+SEARCH_ROW_WIDTHS = [sum(COL_WIDTHS[:14]), sum(COL_WIDTHS[14:])] 
 
 search_col, refresh_col = st.columns(SEARCH_ROW_WIDTHS, vertical_alignment="bottom", gap="small")
 
@@ -650,8 +650,8 @@ with st.container(key="header_row"):
     h11.badge("Return Date")
     h12.badge("Note")
     h13.badge("Status-2")
-    h14.badge("edit")
-    h15.badge("del.")
+    h14.badge("Edit")
+    h15.badge("Del.")
 
     # h14.markdown("&nbsp;")  # empty header for edit button column
     # h15.markdown("&nbsp;")  # empty header for delete button column
@@ -666,21 +666,45 @@ for _, row in list_df.iterrows():
 
         def small(val):
             return f'<p style="font-size:12px; margin:0">{val}</p>'
+        
+        def safe_val(val):
+            if val is None or (isinstance(val, float) and pd.isna(val)) or pd.isna(val) if not isinstance(val, (list, dict)) else False:
+                return "—"
+            if str(val).strip() == "":
+                return "—"
+            return val
 
-        c0.markdown(small(row["s_no"]), unsafe_allow_html=True)
-        c1.markdown(small(row["brand"]), unsafe_allow_html=True)
-        c2.markdown(small(row["model"]), unsafe_allow_html=True)
-        c3.markdown(small(row["serial_no"]), unsafe_allow_html=True)
-        c4.markdown(small(row["item_category"]), unsafe_allow_html=True)
-        c5.markdown(small(row["quantity"]), unsafe_allow_html=True)
-        c6.markdown(small(row["warranty_status"]), unsafe_allow_html=True)
-        c7.markdown(small(row["status"]), unsafe_allow_html=True)
-        c8.markdown(small(row.get("hand_over_to", "")), unsafe_allow_html=True)
+
+        # c0.markdown(small(row["s_no"]), unsafe_allow_html=True)
+        # c1.markdown(small(row["brand"]), unsafe_allow_html=True)
+        # c2.markdown(small(row["model"]), unsafe_allow_html=True)
+        # c3.markdown(small(row["serial_no"]), unsafe_allow_html=True)
+        # c4.markdown(small(row["item_category"]), unsafe_allow_html=True)
+        # c5.markdown(small(row["quantity"]), unsafe_allow_html=True)
+        # c6.markdown(small(row["warranty_status"]), unsafe_allow_html=True)
+        # c7.markdown(small(row["status"]), unsafe_allow_html=True)
+        # c8.markdown(small(row.get("hand_over_to", "")), unsafe_allow_html=True)
+        # c9.markdown(small(str(row["issue_date"]) if pd.notna(row["issue_date"]) else "—"), unsafe_allow_html=True)
+        # c10.markdown(small(row.get("received_from", "")), unsafe_allow_html=True)
+        # c11.markdown(small(str(row["return_date"]) if pd.notna(row["return_date"]) else "—"), unsafe_allow_html=True)
+        # c12.markdown(small(row.get("note", "")), unsafe_allow_html=True)
+        # c13.markdown(small(row.get("status_2", "")), unsafe_allow_html=True)
+
+        c0.markdown(small(safe_val(row["s_no"])), unsafe_allow_html=True)
+        c1.markdown(small(safe_val(row["brand"])), unsafe_allow_html=True)
+        c2.markdown(small(safe_val(row["model"])), unsafe_allow_html=True)
+        c3.markdown(small(safe_val(row["serial_no"])), unsafe_allow_html=True)
+        c4.markdown(small(safe_val(row["item_category"])), unsafe_allow_html=True)
+        c5.markdown(small(safe_val(row["quantity"])), unsafe_allow_html=True)
+        c6.markdown(small(safe_val(row["warranty_status"])), unsafe_allow_html=True)
+        c7.markdown(small(safe_val(row["status"])), unsafe_allow_html=True)
+        c8.markdown(small(safe_val(row.get("hand_over_to", ""))), unsafe_allow_html=True)
         c9.markdown(small(str(row["issue_date"]) if pd.notna(row["issue_date"]) else "—"), unsafe_allow_html=True)
-        c10.markdown(small(row.get("received_from", "")), unsafe_allow_html=True)
+        c10.markdown(small(safe_val(row.get("received_from", ""))), unsafe_allow_html=True)
         c11.markdown(small(str(row["return_date"]) if pd.notna(row["return_date"]) else "—"), unsafe_allow_html=True)
-        c12.markdown(small(row.get("note", "")), unsafe_allow_html=True)
-        c13.markdown(small(row.get("status_2", "")), unsafe_allow_html=True)
+        c12.markdown(small(safe_val(row.get("note", ""))), unsafe_allow_html=True)
+        c13.markdown(small(safe_val(row.get("status_2", ""))), unsafe_allow_html=True)
+
 
         if c14.button("✏️", key=f"edit_{uid}"):
             st.session_state.edit_row = row.to_dict()
