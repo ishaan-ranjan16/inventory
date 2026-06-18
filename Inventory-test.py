@@ -1,9 +1,11 @@
 from ast import In
+
 import streamlit as st
 import pandas as pd
 from datetime import date
 import io
 from db_connection import get_connection
+
 from datetime import datetime
 
 from reportlab.lib.pagesizes import landscape, A4
@@ -12,15 +14,15 @@ from reportlab.lib.units import mm
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
 
+
 st.set_page_config(page_title="Inventory", layout="wide")
 
 # ==========================
-# GLOBAL STYLE — UI Tuning & Continuous Table Lines
+# GLOBAL STYLE — remove top padding / hide default header
 # ==========================
 st.markdown("""
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <style>
-        /* Force explicit 79% viewport magnification scale */
         html {
             zoom: 79%;
         }
@@ -33,7 +35,7 @@ st.markdown("""
             margin-bottom: -5rem;
         }
 
-        /* Hide the Streamlit header bar entirely */
+        /* Hide the Streamlit header bar entirely (hamburger menu, deploy button) */
         header[data-testid="stHeader"] {
             display: none;
         }
@@ -52,10 +54,10 @@ st.markdown("""
 
         /* Tighten vertical spacing between stacked elements page-wide */
         div[data-testid="stVerticalBlock"] {
-            gap: 0rem !important;
+            gap: 0.3rem !important;
         }
 
-        /* Adjust horizontal rows spacing rules */
+        /* Pull horizontal rows (header row, metrics row, table rows) closer together */
         div[data-testid="stHorizontalBlock"] {
             margin-bottom: 0rem;
         }
@@ -74,79 +76,30 @@ st.markdown("""
             height: auto !important;
         }
 
-        /* Refresh button — Aligned right styling */
+        /* Refresh button — square icon button to match search bar height */
         .st-key-refresh_btn button {
-            padding: 5px 0px !important;
-            font-size: 14px !important;
-            height: 31px !important;
-            width: 100% !important;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            padding: 4px 10px !important;
+            font-size: 13px !important;
+            white-space: nowrap !important;
+            height: auto !important;
         }
 
-        /* Blue Bar Header Layout — Ensuring aligned grid separators */
-        .blue-header-bar {
-            background-color: #4A90E2;
-            color: white;
-            padding: 6px 10px;
-            font-weight: bold;
-            font-size: 13px;
-            text-align: center;
-            border-radius: 0px;
-            margin: 0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            height: 34px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-right: 1px solid #357ABD; /* Header Column Separator */
+        /* Space below metrics row (Total/Issued/Available/Damaged) */
+        .st-key-metrics_row {
+            margin-bottom: 1rem;
         }
 
-        /* Clean Table Data Cells Grid — Unified single bottom and single right divider line */
-        .table-cell {
-            font-size: 12px;
-            margin: 0;
-            padding: 6px 8px;
-            border-bottom: 1px solid #E0E0E0; /* Single Line Below Row */
-            border-right: 1px solid #E0E0E0;  /* Single Line Between Columns */
-            min-height: 34px;
-            display: flex;
-            align-items: center;
-            background-color: #FFFFFF;
-            box-sizing: border-box;
-            width: 100%;
+        /* Space below header badges row (Brand/Model/etc) */
+        .st-key-header_row {
+            margin-bottom: 0.7rem;
         }
 
-        /* Action elements wrapper styling layout matching the grid boundaries */
-        .action-cell-wrapper {
-            border-bottom: 1px solid #E0E0E0;
-            min-height: 34px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #FFFFFF;
-            box-sizing: border-box;
-            width: 100%;
-        }
-        
-        .action-cell-left-border {
-            border-left: 1px solid #E0E0E0;
-        }
-
-        /* Row action buttons (edit / delete) */
+        /* Row action buttons (edit / delete) — square icon buttons, tight padding */
         div[class*="st-key-edit_"] button,
         div[class*="st-key-del_"] button {
-            padding: 2px 4px !important;
-            font-size: 12px !important;
-            height: 28px !important;
-            width: 100% !important;
-            margin: 0 !important;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            padding: 2px 8px !important;
+            font-size: 13px !important;
+            height: auto !important;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -166,16 +119,20 @@ def safe_date(val):
 def fetch_inventory():
     conn = get_connection()
     cur = conn.cursor()
+
     cur.execute("SELECT * FROM inventory ORDER BY id DESC")
     rows = cur.fetchall()
     cols = [desc[0] for desc in cur.description]
+
     cur.close()
     conn.close()
+
     return pd.DataFrame(rows, columns=cols)
 
 def insert_inventory(data):
     conn = get_connection()
     cur = conn.cursor()
+
     cur.execute("""
         INSERT INTO inventory (
             brand, model, serial_no, item_category,
@@ -185,6 +142,7 @@ def insert_inventory(data):
         )
         VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
     """, data)
+
     conn.commit()
     cur.close()
     conn.close()
@@ -192,6 +150,7 @@ def insert_inventory(data):
 def update_inventory(serial_no, values):
     conn = get_connection()
     cur = conn.cursor()
+
     cur.execute("""
         UPDATE inventory
         SET
@@ -210,6 +169,7 @@ def update_inventory(serial_no, values):
             status_2=%s
         WHERE serial_no=%s
     """, values)
+
     conn.commit()
     cur.close()
     conn.close()
@@ -217,7 +177,9 @@ def update_inventory(serial_no, values):
 def delete_inventory(serial_no):
     conn = get_connection()
     cur = conn.cursor()
+
     cur.execute("DELETE FROM inventory WHERE serial_no=%s", (serial_no,))
+
     conn.commit()
     cur.close()
     conn.close()
@@ -227,6 +189,7 @@ def delete_inventory(serial_no):
 # ==========================
 def generate_inventory_excel(data: pd.DataFrame) -> bytes:
     buffer = io.BytesIO()
+
     export_df = data.reset_index(drop=True).copy()
 
     columns = [
@@ -244,11 +207,14 @@ def generate_inventory_excel(data: pd.DataFrame) -> bytes:
     export_df.insert(0, "s_no", export_df.index + 1)
     export_df.columns = headers
 
+    # Match the PDF's blank-cell representation with a dash (—) instead of an empty string or NaN
     export_df = export_df.fillna("—")
     export_df = export_df.replace("", "—")
 
     with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
         export_df.to_excel(writer, index=False, sheet_name="Inventory")
+
+        # Auto-fit column widths
         worksheet = writer.sheets["Inventory"]
         for i, col in enumerate(export_df.columns):
             max_len = max(
@@ -297,7 +263,7 @@ def generate_inventory_pdf(data: pd.DataFrame) -> bytes:
         line = [str(idx + 1)]
         for col in columns:
             val = row.get(col, "")
-            line.append(str(int(val)) if col == "quantity" and pd.notna(val) else (str(val) if pd.notna(val) and val != "" else "—"))
+            line.append(str(val) if pd.notna(val) and val != "" else "—")
         table_data.append(line)
 
     table = Table(table_data, repeatRows=1)
@@ -321,33 +287,74 @@ def generate_inventory_pdf(data: pd.DataFrame) -> bytes:
 # ======================
 @st.dialog("📝 Add Inventory")
 def add_inventory_dialog():
+
     with st.form("add_form", clear_on_submit=True):
+
+        # brand = st.selectbox("Brand", ["Dell", "Lenovo", "HP"])
         brand = st.text_input("Brand")
+        # category = st.selectbox("Category", ["Laptop"])
         category = st.text_input("Category")
+
         model = st.text_input("Model")
         serial_no = st.text_input("Serial Number")
-        qty = st.number_input("Quantity", value=1, min_value=1, step=1)
+
+        # warranty = st.selectbox(
+        #     "Warranty Status",
+        #     ["Under Warranty", "Warranty Period Over", "NA"]
+        # )
+        qty = st.number_input("Quantity", value=1, min_value=1)
         warranty = st.text_input("Warranty Status")
+
+        # status = st.selectbox(
+        #     "Status",
+        #     ["In-Inventory", "Issued", "Damaged"]
+        # )
         status = st.text_input("Status")
+
         handover = st.text_input("Handover To")
         received_from = st.text_input("Received From")
 
-        issue_type = st.radio("Issue Date Type", ["Date", "NA"], horizontal=True, key="add_issue_type")
-        issue_date = st.date_input("Issue Date", value=date.today(), key="add_issue_date") if issue_type == "Date" else None
+        issue_type = st.radio(
+            "Issue Date Type",
+            ["Date", "NA"],
+            horizontal=True,
+            key="add_issue_type"
+        )
 
-        return_type = st.radio("Return Date Type", ["Date", "NA"], horizontal=True, key="add_return_type")
-        return_date = st.date_input("Return Date", value=date.today(), key="add_return_date") if return_type == "Date" else None
+        issue_date = (
+            st.date_input("Issue Date", value=date.today(), key="add_issue_date")
+            if issue_type == "Date"
+            else None
+        )
+
+        return_type = st.radio(
+            "Return Date Type",
+            ["Date", "NA"],
+            horizontal=True,
+            key="add_return_type"
+        )
+
+        return_date = (
+            st.date_input("Return Date", value=date.today(), key="add_return_date")
+            if return_type == "Date"
+            else None
+        )
 
         note = st.text_area("📝 Note")
         status_2 = st.text_input("Status-2")
 
         submit = st.form_submit_button(":heavy_plus_sign: Add Item")
+
         if submit:
-            insert_inventory((
-                brand, model, serial_no, category,
-                warranty, int(qty), status, handover, issue_date,
-                received_from, return_date, note, status_2
-            ))
+            insert_inventory(
+                (
+                    brand, model, serial_no, category,
+                    warranty, qty, status,
+                    handover, issue_date,
+                    received_from, return_date,
+                    note, status_2
+                )
+            )
             st.success("Added Successfully")
             st.rerun()
 
@@ -356,38 +363,86 @@ def add_inventory_dialog():
 # ==========================
 @st.dialog("✏️ Edit Inventory")
 def edit_inventory_dialog():
+
     row = st.session_state.edit_row
+
     with st.form("edit_form"):
+
+        # brand = st.selectbox(
+        #     "Brand",
+        #     ["Dell", "Lenovo", "HP"],
+        #     index=["Dell", "Lenovo", "HP"].index(row["brand"])
+        # )
         brand = st.text_input("Brand", value=row["brand"])
+
         model = st.text_input("Model", value=row["model"])
         serial = st.text_input("Serial No", value=row["serial_no"])
         category = st.text_input("Category", value=row["item_category"])
-        
-        current_qty = 1
-        if "quantity" in row and pd.notna(row["quantity"]):
-            try:
-                current_qty = int(float(row["quantity"]))
-            except ValueError:
-                current_qty = 1
 
-        qty = st.number_input("Quantity", value=current_qty, min_value=1, step=1)
+        qty = st.number_input(
+            "Quantity",
+            value=int(row["quantity"]), 
+            # if pd.notna(row["quantity"]) else 1,
+            min_value=1
+        )
+        # qty = st.text_input("Quantity", value=str(row["quantity"]))
+
+        # warranty = st.selectbox(
+        #     "Warranty Status",
+        #     ["Under Warranty", "Warranty Period Over", "NA"],
+        #     index=["Under Warranty", "Warranty Period Over", "NA"].index(row["warranty_status"])
+        # )
         warranty = st.text_input("Warranty Status", value=row["warranty_status"])
+
+        # status = st.selectbox(
+        #     "Status",
+        #     ["In-Inventory", "Issued", "Damaged"],
+        #     index=["In-Inventory", "Issued", "Damaged"].index(row["status"])
+        # )
+
         status = st.text_input("Status", value=row["status"])
+
         handover = st.text_input("Handover To", value=row.get("hand_over_to", ""))
         received = st.text_input("Received From", value=row.get("received_from", ""))
 
-        issue_type = st.radio("Issue Date Type", ["Date", "NA"], horizontal=True, index=0 if pd.notna(row["issue_date"]) else 1, key=f"issue_{row['id']}")
-        issue_date = st.date_input("Issue Date", value=safe_date(row["issue_date"]), key=f"issue_date_{row['id']}")
+        issue_type = st.radio(
+            "Issue Date Type",
+            ["Date", "NA"],
+            horizontal=True,
+            index=0 if pd.notna(row["issue_date"]) else 1,
+            key=f"issue_{row['id']}"
+        )
+
+        issue_date = st.date_input(
+            "Issue Date",
+            value=safe_date(row["issue_date"]),
+            key=f"issue_date_{row['id']}"
+        )
+
         issue_final = issue_date if issue_type == "Date" else None
 
-        return_type = st.radio("Return Date Type", ["Date", "NA"], horizontal=True, index=0 if pd.notna(row["return_date"]) else 1, key=f"return_{row['id']}")
-        return_date = st.date_input("Return Date", value=safe_date(row["return_date"]), key=f"return_date_{row['id']}")
+        return_type = st.radio(
+            "Return Date Type",
+            ["Date", "NA"],
+            horizontal=True,
+            index=0 if pd.notna(row["return_date"]) else 1,
+            key=f"return_{row['id']}"
+        )
+
+        return_date = st.date_input(
+            "Return Date",
+            value=safe_date(row["return_date"]),
+            key=f"return_date_{row['id']}"
+        )
+
         return_final = return_date if return_type == "Date" else None
 
         note = st.text_area("📝 Note", value=row.get("note", ""))
+
         status_2 = st.text_input("Status-2", value=row.get("status_2", ""))
 
         c1, c2 = st.columns(2)
+
         save = c1.form_submit_button("💾 Save")
         cancel = c2.form_submit_button("❌ Cancel")
 
@@ -395,9 +450,20 @@ def edit_inventory_dialog():
             update_inventory(
                 row["serial_no"],
                 (
-                    brand, model, serial, category, warranty, int(qty),
-                    status, handover, issue_final, received, return_final,
-                    note, status_2, row["serial_no"]
+                    brand,
+                    model,
+                    serial,
+                    category,
+                    warranty,
+                    qty,
+                    status,
+                    handover,
+                    issue_final,
+                    received,
+                    return_final,
+                    note,
+                    status_2,
+                    row["serial_no"]
                 )
             )
             st.success("Updated Successfully")
@@ -410,13 +476,18 @@ def edit_inventory_dialog():
 # LOAD DATA
 # ==========================
 df = fetch_inventory()
+
 if not df.empty:
     df.columns = df.columns.str.strip().str.lower()
 
 # ==========================
-# TOP HEADER ROW
+# TOP HEADER ROW — title (left) + Add Inventory , Download PDF (right)
 # ==========================
-title_col, add_col, pdf_col, excel_col = st.columns([6, 1.1, 1.1, 1.1], vertical_alignment="center")
+
+title_col, add_col, pdf_col, excel_col = st.columns(
+    [6, 1.1, 1.1, 1.1],
+    vertical_alignment="center"
+)
 
 with title_col:
     st.badge("**:material/inventory: Overall Inventory Status**", color='green')
@@ -439,6 +510,7 @@ with pdf_col:
 with excel_col:
     excel_bytes = generate_inventory_excel(df)
     st.download_button(
+        # label=":green-badge[:material/description:] Download Excel",
         label=":material/description: Download Excel",
         data=excel_bytes,
         file_name=f"inventory-report_{date.today().strftime('%d-%m-%Y')}.xlsx",
@@ -450,29 +522,66 @@ with excel_col:
 # ==========================
 # METRICS
 # ==========================
-total = len(df)
-Issued = len(df[df["status"].str.lower().isin(["issued"])]) if not df.empty else 0
-Available = len(df[df["status"].str.lower().isin(["in-inventory", "inventory"])]) if not df.empty else 0
-Damaged = len(df[df["status"].str.lower().isin(["damaged"])]) if not df.empty else 0
+# total = len(df)
+# Issued = len(df[df["status"] == "Issued"]) if not df.empty else 0
+# Available = len(df[df["status"] == "In-Inventory"]) if not df.empty else 0
+# Damaged = len(df[df["status"] == "Damaged"]) if not df.empty else 0
 
+# with st.container(key="metrics_row"):
+#     c1, c2, c3, c4 = st.columns(4)
+#     c1.metric("Total", total)
+#     c2.metric("Issued", Issued)
+#     c3.metric("In-Inventory", Available)
+#     c4.metric("Damaged", Damaged)
+
+# total = len(df)
+# Issued = len(df[df["status"] == "Issued"])
+# Available = len(df[df["status"] == "In-Inventory", "inventory", "Inventory"])
+# Damaged = len(df[df["status"] == "Damaged"])
+
+# # Displaying in Streamlit
+# with st.container(key="metrics_row"):
+#     c1, c2, c3, c4 = st.columns(4)
+
+#     c1.metric("Total", total)
+#     c2.metric("Issued", Issued)
+#     c3.metric("In-Inventory", Available)
+#     c4.metric("Damaged", Damaged)
+
+import streamlit as st
+
+total = len(df)
+# Issued = len(df[df["status"] == "Issued"])
+Issued = len(df[df["status"].str.lower().isin(["Issued","issued","ISSUED"])])  # Use .str.lower() to make the comparison case-insensitive
+
+# Available = len(df[df["status"] == "In-Inventory"])  # This line is commented out because it was incomplete
+
+# Use .isin() to match any of the keywords in your list
+Available = len(df[df["status"].str.lower().isin(["In-Inventory","in-inventory","inventory","Inventory", "IN-INVENTORY"])])  
+
+# Damaged = len(df[df["status"] == "Damaged"])
+Damaged = len(df[df["status"].str.lower().isin(["Damaged","damaged","DAMAGED"])])  
+# Use .str.lower() to make the comparison case-insensitive
+
+# Displaying - in Streamlit
 with st.container(key="metrics_row"):
     c1, c2, c3, c4 = st.columns(4)
+
     c1.metric("Total", total)
     c2.metric("Issued", Issued)
     c3.metric("In-Inventory", Available)
     c4.metric("Damaged", Damaged)
 
 # ==========================
-# 📋 INVENTORY LIST (Search Field Setup)
+# 📋 INVENTORY LIST (search box + refresh button)
 # ==========================
+
+# Clear search BEFORE the widget is instantiated, on the rerun triggered by Refresh
 if st.session_state.get("do_clear_search"):
     st.session_state.search_box = ""
     st.session_state.do_clear_search = False
 
-# Layout Grid Configuration Widths
-COL_WIDTHS = [0.5, 1.0, 1.2, 1.2, 1.1, 0.8, 1.4, 1.0, 1.2, 1.1, 1.4, 1.1, 1.5, 1.0, 0.5, 0.5]
-
-search_col, refresh_col = st.columns([sum(COL_WIDTHS[:-2]), COL_WIDTHS[-2] + COL_WIDTHS[-1]], vertical_alignment="bottom")
+search_col, refresh_col = st.columns([8, 1], vertical_alignment="bottom")
 
 with search_col:
     search2 = st.text_input(
@@ -489,81 +598,84 @@ with refresh_col:
         st.rerun()
 
 list_df = df.copy()
+
 if search2:
     list_df = list_df[
-        list_df.apply(lambda r: r.astype(str).str.contains(search2, case=False, na=False).any(), axis=1)
+        list_df.apply(
+            lambda r: r.astype(str).str.contains(search2, case=False, na=False).any(),
+            axis=1
+        )
     ]
 
 list_df = list_df.reset_index(drop=True)
 list_df["s_no"] = list_df.index + 1
 
 # ==========================
-# UNIFIED BLUE BAR TABLE HEADERS (Kept as gap="small")
+# COLUMN LAYOUT — used identically for BOTH header and data rows
+# (14 data columns + 1 edit button column + 1 delete button column)
+# The `gap="small"` parameter gives consistent spacing between every
+# column, including between the edit and delete buttons, instead of
+# relying on a fake "spacer" column that previously got mismatched
+# between the header row and the data rows.
 # ==========================
-with st.container():
-    cols = st.columns(COL_WIDTHS, gap="small")
-    headers = [
-        "S.No", "Brand", "Model", "Serial No.", "Category", "Quantity", 
-        "Warranty", "Status", "Handover To", "Issue Date", "Received From", 
-        "Return Date", "Note", "Status-2"
-    ]
-    
-    for idx in range(len(COL_WIDTHS)):
-        if idx < len(headers):
-            cols[idx].markdown(f'<div class="blue-header-bar">{headers[idx]}</div>', unsafe_allow_html=True)
-        else:
-            # Matches header height over the action buttons smoothly
-            cols[idx].markdown('<div class="blue-header-bar" style="border-right:none; background-color: transparent;">&nbsp;</div>', unsafe_allow_html=True)
+COL_WIDTHS = [0.7, 1.3, 1.5, 1.3, 1.5, 1.0, 1.3, 1.2, 1.3, 1.3, 1.5, 1.3, 1.6, 1.2, 0.6, 0.6]
 
-# ==========================
-# DATA TABLE ROWS WITH BORDERS (Kept as gap="small")
-# ==========================
+# Headers row
+with st.container(key="header_row"):
+    h0, h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14, h15 = st.columns(
+        COL_WIDTHS, gap="small"
+    )
+
+    h0.badge("S.No")
+    h1.badge("Brand")
+    h2.badge("Model")
+    h3.badge("Serial No.")
+    h4.badge("Category")
+    h5.badge("Quantity")
+    h6.badge("Warranty")
+    h7.badge("Status")
+    h8.badge("Handover To")
+    h9.badge("Issue Date")
+    h10.badge("Received From")
+    h11.badge("Return Date")
+    h12.badge("Note")
+    h13.badge("Status-2")
+
 for _, row in list_df.iterrows():
     uid = str(row["id"])
-    cols = st.columns(COL_WIDTHS, gap="small")
+    c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15 = st.columns(
+        COL_WIDTHS, gap="small"
+    )
 
-    def cell_html(val):
-        return f'<div class="table-cell">{val}</div>'
+    def small(val):
+        return f'<p style="font-size:12px; margin:0">{val}</p>'
 
-    # Safe parsed extraction of Quantity integers
-    try:
-        display_qty = str(int(float(row["quantity"]))) if pd.notna(row["quantity"]) else "0"
-    except ValueError:
-        display_qty = str(row["quantity"])
+    c0.markdown(small(row["s_no"]), unsafe_allow_html=True)
+    c1.markdown(small(row["brand"]), unsafe_allow_html=True)
+    c2.markdown(small(row["model"]), unsafe_allow_html=True)
+    c3.markdown(small(row["serial_no"]), unsafe_allow_html=True)
+    c4.markdown(small(row["item_category"]), unsafe_allow_html=True)
+    c5.markdown(small(row["quantity"]), unsafe_allow_html=True)
+    c6.markdown(small(row["warranty_status"]), unsafe_allow_html=True)
+    c7.markdown(small(row["status"]), unsafe_allow_html=True)
+    c8.markdown(small(row.get("hand_over_to", "")), unsafe_allow_html=True)
+    c9.markdown(small(str(row["issue_date"]) if pd.notna(row["issue_date"]) else "—"), unsafe_allow_html=True)
+    c10.markdown(small(row.get("received_from", "")), unsafe_allow_html=True)
+    c11.markdown(small(str(row["return_date"]) if pd.notna(row["return_date"]) else "—"), unsafe_allow_html=True)
+    c12.markdown(small(row.get("note", "")), unsafe_allow_html=True)
+    c13.markdown(small(row.get("status_2", "")), unsafe_allow_html=True)
 
-    cols[0].markdown(cell_html(row["s_no"]), unsafe_allow_html=True)
-    cols[1].markdown(cell_html(row["brand"]), unsafe_allow_html=True)
-    cols[2].markdown(cell_html(row["model"]), unsafe_allow_html=True)
-    cols[3].markdown(cell_html(row["serial_no"]), unsafe_allow_html=True)
-    cols[4].markdown(cell_html(row["item_category"]), unsafe_allow_html=True)
-    cols[5].markdown(cell_html(display_qty), unsafe_allow_html=True)
-    cols[6].markdown(cell_html(row["warranty_status"]), unsafe_allow_html=True)
-    cols[7].markdown(cell_html(row["status"]), unsafe_allow_html=True)
-    cols[8].markdown(cell_html(row.get("hand_over_to", "")), unsafe_allow_html=True)
-    cols[9].markdown(cell_html(str(row["issue_date"]) if pd.notna(row["issue_date"]) else "—"), unsafe_allow_html=True)
-    cols[10].markdown(cell_html(row.get("received_from", "")), unsafe_allow_html=True)
-    cols[11].markdown(cell_html(str(row["return_date"]) if pd.notna(row["return_date"]) else "—"), unsafe_allow_html=True)
-    cols[12].markdown(cell_html(row.get("note", "")), unsafe_allow_html=True)
-    
-    # Last content column cuts right border to connect elegantly with actions column frame layout
-    cols[13].markdown(f'<div class="table-cell" style="border-right: none;">{row.get("status_2", "")}</div>', unsafe_allow_html=True)
+    if c14.button("✏️", key=f"edit_{uid}"):
+        st.session_state.edit_row = row.to_dict()
+        edit_inventory_dialog()
 
-    # Edit Action Cell Block Frame
-    with cols[14]:
-        st.markdown('<div class="action-cell-wrapper action-cell-left-border">', unsafe_allow_html=True)
-        if st.button("✏️", key=f"edit_{uid}"):
-            st.session_state.edit_row = row.to_dict()
-            edit_inventory_dialog()
-        st.markdown('</div>', unsafe_allow_html=True)
-
-    # Delete Action Cell Block Frame
-    with cols[15]:
-        st.markdown('<div class="action-cell-wrapper">', unsafe_allow_html=True)
-        if st.button(":material/delete:", key=f"del_{uid}"):
-            delete_inventory(row["serial_no"])
-            st.warning("Deleted")
-            st.rerun()
-        st.markdown('</div>', unsafe_allow_html=True)
+    if c15.button(":material/delete:", key=f"del_{uid}"):
+        delete_inventory(row["serial_no"])
+        st.warning("Deleted")
+        st.rerun()
 
 st.divider()
+# ----------------------------
+# Footer
+# ----------------------------
 st.caption("Inventory Management System • Dashboard")
