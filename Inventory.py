@@ -187,40 +187,85 @@ def delete_inventory(serial_no):
 # ==========================
 # def generate_inventory_excel(data: pd.DataFrame) -> bytes:
 #     buffer = io.BytesIO()
-#     with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
-#         data.to_excel(writer, index=False, sheet_name="Inventory")
 
-#         # Optional: auto-fit column widths
+#     export_df = data.reset_index(drop=True).copy()
+
+#     # Same columns, same order, same friendly headers as the PDF export,
+#     # so both exports look consistent with each other.
+#     columns = [
+#         "brand", "model", "serial_no", "item_category", "quantity",
+#         "warranty_status", "status", "hand_over_to", "issue_date",
+#         "received_from", "return_date", "note", "status_2",
+#     ]
+#     headers = [
+#         "Brand", "Model", "Serial No", "Category", "Quantity",
+#         "Warranty", "Status", "Handover To", "Issue Date",
+#         "Received From", "Return Date", "Note", "Status-2",
+#     ]
+
+#     export_df = export_df[columns]
+#     export_df.columns = headers
+
+#     export_df.insert(0, "S.No", export_df.index + 1)
+
+#     # Match the PDF's blank-cell convention
+#     export_df = export_df.fillna("—")
+#     export_df = export_df.replace("", "—")
+
+#     with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
+#         export_df.to_excel(writer, index=False, sheet_name="Inventory")
+
+#         # Auto-fit column widths
 #         worksheet = writer.sheets["Inventory"]
-#         for i, col in enumerate(data.columns):
+#         for i, col in enumerate(export_df.columns):
 #             max_len = max(
-#                 data[col].astype(str).map(len).max() if not data.empty else 0,
+#                 export_df[col].astype(str).map(len).max() if not export_df.empty else 0,
 #                 len(str(col))
 #             ) + 2
-#             worksheet.column_dimensions[chr(65 + i) if i < 26 else "A" + chr(65 + i - 26)].width = max_len
+#             col_letter = chr(65 + i) if i < 26 else "A" + chr(65 + i - 26)
+#             worksheet.column_dimensions[col_letter].width = max_len
 
 #     buffer.seek(0)
-#     return buffer.getvalue() 
+#     return buffer.getvalue()
+
 def generate_inventory_excel(data: pd.DataFrame) -> bytes:
     buffer = io.BytesIO()
 
     export_df = data.reset_index(drop=True).copy()
-    if "id" in export_df.columns:
-        export_df = export_df.drop(columns=["id"])
 
-    export_df.insert(0, "S.No", export_df.index + 1)
+    # Same columns, same order, same friendly headers as the PDF export,
+    # so both exports look consistent with each other.
+    columns = [
+        "brand", "model", "serial_no", "item_category", "quantity",
+        "warranty_status", "status", "hand_over_to", "issue_date",
+        "received_from", "return_date", "note", "status_2",
+    ]
+    headers = [
+        "S.No", "Brand", "Model", "Serial No", "Category", "Quantity",
+        "Warranty", "Status", "Handover To", "Issue Date",
+        "Received From", "Return Date", "Note", "Status-2",
+    ]
+
+    export_df = export_df[columns]
+    export_df.insert(0, "s_no", export_df.index + 1)
+    export_df.columns = headers
+
+    # Match the PDF's blank-cell convention
+    export_df = export_df.fillna("—")
+    export_df = export_df.replace("", "—")
 
     with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
         export_df.to_excel(writer, index=False, sheet_name="Inventory")
 
-        # Optional: auto-fit column widths
+        # Auto-fit column widths
         worksheet = writer.sheets["Inventory"]
         for i, col in enumerate(export_df.columns):
             max_len = max(
                 export_df[col].astype(str).map(len).max() if not export_df.empty else 0,
                 len(str(col))
             ) + 2
-            worksheet.column_dimensions[chr(65 + i) if i < 26 else "A" + chr(65 + i - 26)].width = max_len
+            col_letter = chr(65 + i) if i < 26 else "A" + chr(65 + i - 26)
+            worksheet.column_dimensions[col_letter].width = max_len
 
     buffer.seek(0)
     return buffer.getvalue()
@@ -228,56 +273,6 @@ def generate_inventory_excel(data: pd.DataFrame) -> bytes:
 # ==========================
 # PDF EXPORT
 # ==========================
-# def generate_inventory_pdf(data: pd.DataFrame) -> bytes:
-#     buffer = io.BytesIO()
-#     doc = SimpleDocTemplate(
-#         buffer,
-#         pagesize=landscape(A4),
-#         leftMargin=10 * mm, rightMargin=10 * mm,
-#         topMargin=12 * mm, bottomMargin=12 * mm,
-#     )
-#     styles = getSampleStyleSheet()
-#     elements = []
-
-#     elements.append(Paragraph("Inventory Report", styles["Title"]))
-#     elements.append(Paragraph(f"Generated on {datetime.now().strftime('%d-%m-%Y %I:%M:%S %p')}", styles["Normal"]))
-#     elements.append(Spacer(1, 10))
-
-#     columns = [
-#         "brand", "model", "serial_no", "item_category", "quantity",
-#         "warranty_status", "status", "hand_over_to", "issue_date",
-#         "received_from", "return_date", "note", "status_2",
-#     ]
-#     headers = [
-#         "S.No", "Brand", "Model", "Serial No", "Category", "Quantity",
-#         "Warranty", "Status", "Handover To", "Issue Date",
-#         "Received From", "Return Date", "Note", "Status-2",
-#     ]
-
-#     table_data = [headers]
-#     for _, row in data.iterrows():
-#         line = []
-#         for col in columns:
-#             val = row.get(col, "")
-#             line.append(str(val) if pd.notna(val) and val != "" else "—")
-#         table_data.append(line)
-
-#     table = Table(table_data, repeatRows=1)
-#     table.setStyle(TableStyle([
-#         ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#2C3E50")),
-#         ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-#         ("FONTSIZE", (0, 0), (-1, -1), 7),
-#         ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-#         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-#         ("GRID", (0, 0), (-1, -1), 0.4, colors.grey),
-#         ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#F4F6F7")]),
-#     ]))
-
-#     elements.append(table)
-#     doc.build(elements)
-#     buffer.seek(0)
-#     return buffer.getvalue()
-
 def generate_inventory_pdf(data: pd.DataFrame) -> bytes:
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(
@@ -335,8 +330,7 @@ def generate_inventory_pdf(data: pd.DataFrame) -> bytes:
 # ======================
 @st.dialog("📝 Add Inventory")
 def add_inventory_dialog():
-    
-    
+
     with st.form("add_form", clear_on_submit=True):
 
         brand = st.selectbox("Brand", ["Dell", "Lenovo", "HP"])
@@ -387,16 +381,7 @@ def add_inventory_dialog():
         note = st.text_area("📝 Note")
         status_2 = st.text_input("Status-2")
 
-        # st.markdown("""
-        #     <style>
-        #         div[data-testid="stFormSubmitButton"] [data-testid="stIconMaterial"] {
-        #             color: #33b1ff !important; /* Change this to your exact custom hex color */
-        #         }
-        #     </style>
-        # """)
-
         submit = st.form_submit_button(":heavy_plus_sign: Add Item")
-        # submit = st.form_submit_button("Add Item", icon=":material/add:")
 
         if submit:
             insert_inventory(
@@ -647,8 +632,6 @@ with st.container(key="header_row"):
     h11.badge("Return Date")
     h12.badge("Note")
     h13.badge("Status-2")
-    # h14.badge("Edit")
-    # h15.badge("Del")
 
 for _, row in list_df.iterrows():
     uid = str(row["id"])
