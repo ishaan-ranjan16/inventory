@@ -185,56 +185,11 @@ def delete_inventory(serial_no):
 # ==========================
 # EXCEL EXPORT
 # ==========================
-# def generate_inventory_excel(data: pd.DataFrame) -> bytes:
-#     buffer = io.BytesIO()
-
-#     export_df = data.reset_index(drop=True).copy()
-
-#     # Same columns, same order, same friendly headers as the PDF export,
-#     # so both exports look consistent with each other.
-#     columns = [
-#         "brand", "model", "serial_no", "item_category", "quantity",
-#         "warranty_status", "status", "hand_over_to", "issue_date",
-#         "received_from", "return_date", "note", "status_2",
-#     ]
-#     headers = [
-#         "Brand", "Model", "Serial No", "Category", "Quantity",
-#         "Warranty", "Status", "Handover To", "Issue Date",
-#         "Received From", "Return Date", "Note", "Status-2",
-#     ]
-
-#     export_df = export_df[columns]
-#     export_df.columns = headers
-
-#     export_df.insert(0, "S.No", export_df.index + 1)
-
-#     # Match the PDF's blank-cell convention
-#     export_df = export_df.fillna("—")
-#     export_df = export_df.replace("", "—")
-
-#     with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
-#         export_df.to_excel(writer, index=False, sheet_name="Inventory")
-
-#         # Auto-fit column widths
-#         worksheet = writer.sheets["Inventory"]
-#         for i, col in enumerate(export_df.columns):
-#             max_len = max(
-#                 export_df[col].astype(str).map(len).max() if not export_df.empty else 0,
-#                 len(str(col))
-#             ) + 2
-#             col_letter = chr(65 + i) if i < 26 else "A" + chr(65 + i - 26)
-#             worksheet.column_dimensions[col_letter].width = max_len
-
-#     buffer.seek(0)
-#     return buffer.getvalue()
-
 def generate_inventory_excel(data: pd.DataFrame) -> bytes:
     buffer = io.BytesIO()
 
     export_df = data.reset_index(drop=True).copy()
 
-    # Same columns, same order, same friendly headers as the PDF export,
-    # so both exports look consistent with each other.
     columns = [
         "brand", "model", "serial_no", "item_category", "quantity",
         "warranty_status", "status", "hand_over_to", "issue_date",
@@ -250,7 +205,7 @@ def generate_inventory_excel(data: pd.DataFrame) -> bytes:
     export_df.insert(0, "s_no", export_df.index + 1)
     export_df.columns = headers
 
-    # Match the PDF's blank-cell convention
+    # Match the PDF's blank-cell representation with a dash (—) instead of an empty string or NaN
     export_df = export_df.fillna("—")
     export_df = export_df.replace("", "—")
 
@@ -580,7 +535,8 @@ search_col, refresh_col = st.columns([8, 1], vertical_alignment="bottom")
 with search_col:
     search2 = st.text_input(
         "Search Inventory List",
-        placeholder="🔍 Search....",
+        placeholder="Search...",
+        icon=":material/search:",
         label_visibility="collapsed",
         key="search_box"
     )
