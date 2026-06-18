@@ -531,7 +531,7 @@ with add_col:
 with pdf_col:
     pdf_bytes = generate_inventory_pdf(df)
     st.download_button(
-        label=":material/picture_as_pdf: Download PDF",
+        label=":material/download: Download PDF",
         data=pdf_bytes,
         file_name=f"inventory-report_{date.today().strftime('%d-%m-%Y')}.pdf",
         mime="application/pdf",
@@ -542,7 +542,8 @@ with pdf_col:
 with excel_col:
     excel_bytes = generate_inventory_excel(df)
     st.download_button(
-        label="📄Download Excel",
+        # label=":green-badge[:material/description:] Download Excel",
+        label=":material/download: Download Excel",
         data=excel_bytes,
         file_name=f"inventory-report_{date.today().strftime('%d-%m-%Y')}.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
