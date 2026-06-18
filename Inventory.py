@@ -22,7 +22,7 @@ st.markdown("""
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <style>
         html {
-            zoom: 80%;
+            zoom: 79%;
         }
 
         /* Remove the default top padding above your content */
