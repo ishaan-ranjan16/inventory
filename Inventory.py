@@ -158,9 +158,34 @@ def fetch_inventory():
 
     return pd.DataFrame(rows, columns=cols)
 
+# def insert_inventory(data):
+#     conn = get_connection()
+#     cur = conn.cursor()
+
+#     cur.execute("""
+#         INSERT INTO inventory (
+#             brand, model, serial_no, item_category,
+#             warranty_status, quantity, status,
+#             hand_over_to, issue_date, received_from,
+#             return_date, note, status_2
+#         )
+#         VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+#     """, data)
+
+#     conn.commit()
+#     cur.close()
+#     conn.close()
+
 def insert_inventory(data):
     conn = get_connection()
     cur = conn.cursor()
+    
+    # Convert dates to string format explicitly before sending to DB
+    clean_data = list(data)
+    if clean_data[8]:  # issue_date index
+        clean_data[8] = clean_data[8].strftime('%Y-%m-%d')
+    if clean_data[10]: # return_date index
+        clean_data[10] = clean_data[10].strftime('%Y-%m-%d')
 
     cur.execute("""
         INSERT INTO inventory (
@@ -169,16 +194,50 @@ def insert_inventory(data):
             hand_over_to, issue_date, received_from,
             return_date, note, status_2
         )
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-    """, data)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    """, tuple(clean_data))
 
     conn.commit()
     cur.close()
     conn.close()
 
-def update_inventory(serial_no, values):
+# def update_inventory(serial_no, values):
+#     conn = get_connection()
+#     cur = conn.cursor()
+
+#     cur.execute("""
+#         UPDATE inventory
+#         SET
+#             brand=%s,
+#             model=%s,
+#             serial_no=%s,
+#             item_category=%s,
+#             warranty_status=%s,
+#             quantity=%s,
+#             status=%s,
+#             hand_over_to=%s,
+#             issue_date=%s,
+#             received_from=%s,
+#             return_date=%s,
+#             note=%s,
+#             status_2=%s
+#         WHERE serial_no=%s
+#     """, values)
+
+#     conn.commit()
+#     cur.close()
+#     conn.close()
+
+def update_inventory(values): # Remove the redundant first argument!
     conn = get_connection()
     cur = conn.cursor()
+
+    clean_values = list(values)
+    # Safely convert date objects to strings if they exist
+    if clean_values[8]:  # issue_final
+        clean_values[8] = clean_values[8].strftime('%Y-%m-%d')
+    if clean_values[10]: # return_final
+        clean_values[10] = clean_values[10].strftime('%Y-%m-%d')
 
     cur.execute("""
         UPDATE inventory
@@ -197,7 +256,7 @@ def update_inventory(serial_no, values):
             note=%s,
             status_2=%s
         WHERE serial_no=%s
-    """, values)
+    """, tuple(clean_values))
 
     conn.commit()
     cur.close()
@@ -477,28 +536,52 @@ def edit_inventory_dialog():
         save = c1.form_submit_button("💾 Save")
         cancel = c2.form_submit_button("❌ Cancel")
 
+        # if save:
+        #     update_inventory(
+        #         row["serial_no"],
+        #         (
+        #             brand,
+        #             model,
+        #             serial,
+        #             category,
+        #             warranty,
+        #             qty,
+        #             status,
+        #             handover,
+        #             issue_final,
+        #             received,
+        #             return_final,
+        #             note,
+        #             status_2,
+        #             row["serial_no"]
+        #         )
+        #     )
+        #     st.success("Updated Successfully")
+        #     st.rerun()
+
+        # Build your tuple parameter exactly matching the 14 placeholders in UPDATE
         if save:
-            update_inventory(
-                row["serial_no"],
-                (
-                    brand,
-                    model,
-                    serial,
-                    category,
-                    warranty,
-                    qty,
-                    status,
-                    handover,
-                    issue_final,
-                    received,
-                    return_final,
-                    note,
-                    status_2,
-                    row["serial_no"]
+            payload = (
+                brand,
+                model,
+                serial,
+                category,
+                warranty,
+                qty,
+                status,
+                handover,
+                issue_final,   # Will be date object or None
+                received,
+                return_final,  # Will be date object or None
+                note,
+                status_2,
+                row["serial_no"]  # Target criteria for WHERE clause
                 )
-            )
-            st.success("Updated Successfully")
-            st.rerun()
+
+        # Call the modified update function directly with the payload
+        update_inventory(payload)
+        st.success("Updated Successfully")
+        st.rerun()
 
         if cancel:
             st.rerun()
