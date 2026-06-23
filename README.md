@@ -61,16 +61,26 @@ It provides a clean dashboard for managing inventory assets, tracking item lifec
 
 INVENTORY_MGT/
 │
-├── pages/ # Streamlit multipage (optional)
-├── tests/ # Pytest test cases
-├── db_connection.py # Database connection handler
-├── inventory.py # Main Streamlit dashboard
-├── Inventory-test.py # Experimental/test UI script
-├── test.py # Legacy test script
-├── .env # Environment variables
-├── .gitignore
-└── README.md
-
+├── pages/                      # Streamlit multipage app (optional future expansion)
+├── tests/                      # Pytest-based test cases
+│   ├── test_db_connection.py
+│   ├── test_inventory_operations.py
+│   └── test_ui_logic.py
+│
+├── __pycache__/               # Python cache (auto-generated)
+├── .pytest_cache/             # Pytest cache (auto-generated)
+│
+├── db_connection.py           # Database connection handler (PostgreSQL/MySQL)
+├── inventory.py               # Main Streamlit dashboard application
+├── Inventory-test.py          # Experimental / UI testing script
+├── test.py                    # Legacy test script (can be migrated to pytest)
+│
+├── .env                       # Environment variables (DB credentials, secrets)
+├── .gitignore                # Git ignore rules
+├── requirements.txt          # Project dependencies
+├── README.md                 # Project documentation
+│
+└── exports/                  # (Optional) Generated PDF/Excel reports storage
 
 ---
 
