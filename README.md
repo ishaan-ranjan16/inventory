@@ -58,7 +58,6 @@ It provides a clean dashboard for managing inventory assets, tracking item lifec
 
 # 📁 Project Structure
 
-
 INVENTORY_MGT/
 │
 ├── pages/                      # Streamlit multipage app (optional future expansion)
