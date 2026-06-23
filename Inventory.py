@@ -1,5 +1,3 @@
-from ast import In
-
 import streamlit as st
 import pandas as pd
 from datetime import date
@@ -555,8 +553,6 @@ with excel_col:
 # ==========================
 # METRICS
 # ==========================
-import streamlit as st
-
 total = len(df)
 Issued = len(df[df["status"].str.lower().isin(["Issued","issued","ISSUED"])]) 
  # Use .str.lower() to make the comparison case-insensitive
