@@ -655,31 +655,55 @@ def edit_inventory_dialog():
         #     st.rerun()
 
         # Build your tuple parameter exactly matching the 14 placeholders in UPDATE
-        if save:
-            payload = (
-                brand,
-                model,
-                serial,
-                category,
-                warranty,
-                qty,
-                status,
-                handover,
-                issue_final,   # Will be date object or None
-                received,
-                return_final,  # Will be date object or None
-                note,
-                status_2,
-                row["serial_no"]  # Target criteria for WHERE clause
-                )
+    # if save:
+    #     payload = (
+    #         brand,
+    #         model,
+    #         serial,
+    #         category,
+    #         warranty,
+    #         qty,
+    #         status,
+    #         handover,
+    #         issue_final,   # Will be date object or None
+    #         received,
+    #         return_final,  # Will be date object or None
+    #         note,
+    #         status_2,
+    #         row["serial_no"]  # Target criteria for WHERE clause
+    #         )
 
-        # Call the modified update function directly with the payload
+    #     # Call the modified update function directly with the payload
+    #         update_inventory(payload)
+    #         st.success("Updated Successfully")
+    #         st.rerun()
+
+    # if cancel:
+    #     st.rerun()
+    if save:
+        payload = (
+            brand,
+            model,
+            serial,
+            category,
+            warranty,
+            qty,
+            status,
+            handover,
+            issue_final,
+            received,
+            return_final,
+            note,
+            status_2,
+            row["serial_no"]
+        )
+        
         update_inventory(payload)
         st.success("Updated Successfully")
         st.rerun()
 
-        if cancel:
-            st.rerun()
+    if cancel:
+        st.rerun()
 
 # ==========================
 # LOAD DATA
