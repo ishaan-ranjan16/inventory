@@ -4,3 +4,4 @@ __pycache__/
 
 # Ignore the test script
 test.py
+Inventory-test.py
