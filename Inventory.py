@@ -506,7 +506,11 @@ def edit_inventory_dialog():
 # ==========================
 # LOAD DATA
 # ==========================
-df = fetch_inventory()
+# df = fetch_inventory()
+def load_data():
+    return fetch_inventory()
+
+df = load_data()
 
 if not df.empty:
     df.columns = df.columns.str.strip().str.lower()
