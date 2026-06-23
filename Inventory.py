@@ -145,18 +145,113 @@ def safe_date(val):
 # ==========================
 # DATABASE FUNCTIONS
 # ==========================
+# def fetch_inventory():
+#     conn = get_connection()
+#     cur = conn.cursor()
+
+#     cur.execute("SELECT * FROM inventory ORDER BY id DESC")
+#     rows = cur.fetchall()
+#     cols = [desc[0] for desc in cur.description]
+
+#     cur.close()
+#     conn.close()
+
+#     return pd.DataFrame(rows, columns=cols)
+#------------------------------------------------------
+
 def fetch_inventory():
-    conn = get_connection()
-    cur = conn.cursor()
+    """
+    Fetches the full inventory dataset securely using explicit columns.
+    If a database downtime or timeout happens, it catches the exception,
+    notifies the UI cleanly, and returns an empty schema-compliant DataFrame.
+    """
+    # Explicit blueprint schema containing all 14 database columns required by the UI table rows
+    columns = [
+        "id", "brand", "model", "serial_no", "item_category", "quantity", 
+        "warranty_status", "status", "hand_over_to", "issue_date", 
+        "received_from", "return_date", "note", "status_2"
+    ]
+    
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
+        
+        # Explicit column fetching prevents index-ordering mismatches
+        query = """
+            SELECT id, brand, model, serial_no, item_category, quantity, 
+                   warranty_status, status, hand_over_to, issue_date, 
+                   received_from, return_date, note, status_2 
+            FROM inventory 
+            ORDER BY id DESC
+        """
+        cur.execute(query)
+        rows = cur.fetchall()
+        
+        cur.close()
+        conn.close()
+        
+        # Build DataFrame with explicit columns layout guaranteed
+        return pd.DataFrame(rows, columns=columns)
+        
+    except Exception as e:
+        # 1. Log the exact raw technical exception details to terminal for developers
+        print(f"CRITICAL DATABASE ERROR: {e}")
+        
+        # 2. Render a clean notification component warning the user inside the Streamlit UI
+        st.error("⚠️ Downtime Alert: Unable to connect to the inventory database right now. Please try again later.")
+        
+        # 3. Return a clean fallback structure matching the column configuration schema 
+        # This prevents dependent calculations (like metrics calculating total/issued) from crashing.
+        return pd.DataFrame(columns=columns)
 
-    cur.execute("SELECT * FROM inventory ORDER BY id DESC")
-    rows = cur.fetchall()
-    cols = [desc[0] for desc in cur.description]
+# def fetch_inventory():
+#     try:
+#         conn = get_connection()
+#         cur = conn.cursor()
+        
+#         cur.execute("SELECT id, brand, model, serial_no, item_category, quantity, status FROM inventory")
+#         rows = cur.fetchall()
+        
+#         # Build DataFrame safely
+#         # ... logic to return data ...
+#         return rows
+        
+#     except Exception as e:
+#         # 1. Log the real error to the server terminal/logs for the dev team
+#         print(f"CRITICAL DATABASE ERROR: {e}")
+#         # 2. Show a clean, user-friendly alert message in the Streamlit UI
+#         st.error("Downtime Alert: Unable to connect to the inventory database right now. Please try again later.")
+#         # 3. Reraise or return empty container so downstream UI components don't crash
+#         raise Exception(f"Database connection timeout: {e}")
 
-    cur.close()
-    conn.close()
-
-    return pd.DataFrame(rows, columns=cols)
+# def fetch_inventory():
+#     # Define your canonical column blueprint
+#     columns = ["id", "brand", "model", "serial_no", "item_category", "quantity", "status"]
+    
+#     try:
+#         conn = get_connection()
+#         cur = conn.cursor()
+        
+#         # Explicitly fetch your required columns
+#         cur.execute("SELECT id, brand, model, serial_no, item_category, quantity, status FROM inventory ORDER BY id DESC")
+#         rows = cur.fetchall()
+        
+#         cur.close()
+#         conn.close()
+        
+#         # Build DataFrame normally on a happy path execution
+#         return pd.DataFrame(rows, columns=columns)
+        
+#     except Exception as e:
+#         # 1. Log the exact raw technical traceback to the console logs for debugging
+#         print(f"CRITICAL DATABASE ERROR: {e}")
+        
+#         # 2. Render a clean, safe notification wrapper UI component for your users
+#         st.error("⚠️ Downtime Alert: Unable to connect to the inventory database right now. Please try again later.")
+        
+#         # 3. Return an empty structure matching the exact schema configuration blueprint
+#         # This keeps down-stream app graphs (like graphs/data-tables) from collapsing entirely.
+#         return pd.DataFrame(columns=columns)
 
 # def insert_inventory(data):
 #     conn = get_connection()
