@@ -913,7 +913,7 @@ for _, row in list_df.iterrows():
 
         if c15.button(":material/delete:", key=f"del_{uid}"):
             delete_inventory(row["serial_no"])
-            st.warning("Deleted")
+            st.warning("Deleted Successfully")
             st.rerun()
 
 st.divider()
