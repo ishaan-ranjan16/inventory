@@ -1,6 +1,8 @@
 __pycache__/
 *.pyc
 .env
+inventory.db
+*.db
 
 # Ignore the test script
 test.py
