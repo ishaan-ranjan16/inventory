@@ -200,18 +200,27 @@ def update_inventory(values):
             return_date=?,
             note=?,
             status_2=?
-        WHERE serial_no=?
+        WHERE id=?
     """, tuple(clean_values))
+        # WHERE serial_no=?
+
 
     conn.commit()
     cur.close()
     conn.close()
 
 
-def delete_inventory(serial_no):
+# def delete_inventory(serial_no):
+#     conn = get_connection()
+#     cur = conn.cursor()
+#     cur.execute("DELETE FROM inventory WHERE serial_no=?", (serial_no,))
+#     conn.commit()
+#     cur.close()
+#     conn.close()
+def delete_inventory(id):
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("DELETE FROM inventory WHERE serial_no=?", (serial_no,))
+    cur.execute("DELETE FROM inventory WHERE id=?", (id,))
     conn.commit()
     cur.close()
     conn.close()
@@ -596,8 +605,10 @@ for _, row in list_df.iterrows():
             st.session_state.edit_row = row.to_dict()
             edit_inventory_dialog()
 
+        # if c15.button(":material/delete:", key=f"del_{uid}"):
+        #     delete_inventory(row["serial_no"])
         if c15.button(":material/delete:", key=f"del_{uid}"):
-            delete_inventory(row["serial_no"])
+            delete_inventory(row["id"])
             st.warning("Deleted Successfully")
             st.rerun()
 
