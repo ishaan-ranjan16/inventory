@@ -2,6 +2,10 @@ __pycache__/
 *.pyc
 .env
 *.db
+*.sqlite
+*.sqlite3
+*.pyo
+.pytest_cache/
 
 # Ignore the test script
 test.py
