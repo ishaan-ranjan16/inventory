@@ -482,6 +482,13 @@ Issued    = len(df[df["status"].str.lower().isin(["issued"])])
 Available = len(df[df["status"].str.lower().isin(["in-inventory", "inventory"])])
 Damaged   = len(df[df["status"].str.lower().isin(["damaged"])])
 
+# Issued = len(df[df["status"].str.lower().isin(["Issued","issued","ISSUED"])]) 
+#  # Use .str.lower() to make the comparison case-insensitive
+
+# Available = len(df[df["status"].str.lower().isin(["In-Inventory","in-inventory","inventory","Inventory", "IN-INVENTORY"])])  
+
+# Damaged = len(df[df["status"].str.lower().isin(["Damaged","damaged","DAMAGED"])])  
+
 with st.container(key="metrics_row"):
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("Total",        total)
