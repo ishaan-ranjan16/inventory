@@ -1,10 +1,12 @@
+import pandas as pd
+
 from inventory import (
     insert_inventory,
-    update_inventory,
     fetch_inventory,
+    delete_inventory,
 )
 
-def test_update_inventory(test_db):
+def test_insert_inventory(test_db):
 
     insert_inventory(
         (
@@ -26,28 +28,35 @@ def test_update_inventory(test_db):
 
     df = fetch_inventory()
 
-    row_id = int(df.iloc[0]["id"])
+    assert len(df) == 1
+    assert df.iloc[0]["brand"] == "Dell"
 
-    update_inventory(
+
+def test_delete_inventory(test_db):
+
+    insert_inventory(
         (
-            "HP",
-            "EliteBook",
+            "Dell",
+            "Latitude",
             "ABC123",
             "Laptop",
-            "Expired",
-            2,
-            "Inventory",
-            "Mike",
+            "Active",
+            1,
+            "Issued",
+            "John",
             None,
             "Vendor",
             None,
-            "Updated",
-            "Excellent",
-            row_id,
+            "Testing",
+            "Good",
         )
     )
 
-    updated = fetch_inventory()
+    df = fetch_inventory()
+    row_id = int(df.iloc[0]["id"])
 
-    assert updated.iloc[0]["brand"] == "HP"
-    assert updated.iloc[0]["quantity"] == 2
+    delete_inventory(row_id)
+
+    df_after = fetch_inventory()
+
+    assert len(df_after) == 0
