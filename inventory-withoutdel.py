@@ -104,12 +104,6 @@ st.markdown("""
 if "edit_row" not in st.session_state:
     st.session_state.edit_row = None
 
-if "delete_id" not in st.session_state:
-    st.session_state.delete_id = None
-
-if "delete_label" not in st.session_state:
-    st.session_state.delete_label = ""
-
 def safe_date(val):
     if val is None or (isinstance(val, str) and val.strip() == ""):
         return date.today()
@@ -146,6 +140,7 @@ def fetch_inventory():
         cur.close()
         conn.close()
 
+        # sqlite3.Row objects → list of plain tuples for DataFrame
         return pd.DataFrame([tuple(r) for r in rows], columns=columns)
 
     except Exception as e:
@@ -159,9 +154,9 @@ def insert_inventory(data):
     cur = conn.cursor()
 
     clean_data = list(data)
-    if clean_data[8]:
+    if clean_data[8]:   # issue_date
         clean_data[8] = clean_data[8].strftime('%Y-%m-%d')
-    if clean_data[10]:
+    if clean_data[10]:  # return_date
         clean_data[10] = clean_data[10].strftime('%Y-%m-%d')
 
     cur.execute("""
@@ -184,9 +179,9 @@ def update_inventory(values):
     cur = conn.cursor()
 
     clean_values = list(values)
-    if clean_values[8]:
+    if clean_values[8]:   # issue_final
         clean_values[8] = clean_values[8].strftime('%Y-%m-%d')
-    if clean_values[10]:
+    if clean_values[10]:  # return_final
         clean_values[10] = clean_values[10].strftime('%Y-%m-%d')
 
     cur.execute("""
@@ -207,12 +202,21 @@ def update_inventory(values):
             status_2=?
         WHERE id=?
     """, tuple(clean_values))
+        # WHERE serial_no=?
+
 
     conn.commit()
     cur.close()
     conn.close()
 
 
+# def delete_inventory(serial_no):
+#     conn = get_connection()
+#     cur = conn.cursor()
+#     cur.execute("DELETE FROM inventory WHERE serial_no=?", (serial_no,))
+#     conn.commit()
+#     cur.close()
+#     conn.close()
 def delete_inventory(id):
     conn = get_connection()
     cur = conn.cursor()
@@ -423,7 +427,8 @@ def edit_inventory_dialog():
             handover, issue_final,
             received, return_final,
             note, status_2,
-            row["id"]
+            row["id"]   
+            # row["serial_no"]   # WHERE clause
         )
         update_inventory(payload)
         st.success("Updated Successfully")
@@ -431,38 +436,6 @@ def edit_inventory_dialog():
 
     if cancel:
         st.rerun()
-
-# ==========================
-# CONFIRM DELETE DIALOG
-# ==========================
-@st.dialog("🗑️ Confirm Delete")
-def confirm_delete_dialog():
-    item_id    = st.session_state.delete_id
-    item_label = st.session_state.delete_label
-
-    st.warning(f"Are you sure you want to delete this item?")
-    st.markdown(
-        f'<p style="font-size:13px; margin: 4px 0 12px 0;">'
-        f'<b>Item:</b> {item_label}</p>',
-        unsafe_allow_html=True
-    )
-    st.caption("This action cannot be undone.")
-
-    c1, c2 = st.columns(2)
-
-    with c1:
-        if st.button("🗑️ Yes, Delete", type="primary", use_container_width=True):
-            delete_inventory(item_id)
-            st.session_state.delete_id    = None
-            st.session_state.delete_label = ""
-            st.warning("Deleted Successfully")
-            st.rerun()
-
-    with c2:
-        if st.button("❌ Cancel", use_container_width=True):
-            st.session_state.delete_id    = None
-            st.session_state.delete_label = ""
-            st.rerun()
 
 # ==========================
 # LOAD DATA
@@ -518,6 +491,31 @@ total     = len(df)
 Issued    = len(df[df["status"].str.lower().isin(["issued"])])
 Available = len(df[df["status"].str.lower().isin(["in-inventory", "inventory"])])
 Damaged   = len(df[df["status"].str.lower().isin(["damaged"])])
+
+
+# total = len(df)
+
+# Issued = (
+#     (df["status"].notna()) &
+#     (df["status-2"].fillna("").str.lower() == "issued")
+# ).sum()
+
+# Available = (
+#     df["status"].fillna("").str.lower().isin(
+#         ["in-inventory", "inventory"]
+#     )
+# ).sum()
+
+# Damaged = (
+#     df["status"].fillna("").str.lower() == "damaged"
+# ).sum()
+
+# Issued = len(df[df["status"].str.lower().isin(["Issued","issued","ISSUED"])]) 
+#  # Use .str.lower() to make the comparison case-insensitive
+
+# Available = len(df[df["status"].str.lower().isin(["In-Inventory","in-inventory","inventory","Inventory", "IN-INVENTORY"])])  
+
+# Damaged = len(df[df["status"].str.lower().isin(["Damaged","damaged","DAMAGED"])])  
 
 with st.container(key="metrics_row"):
     c1, c2, c3, c4 = st.columns(4)
@@ -594,6 +592,7 @@ def safe_val(val):
     return val
 
 def safe_date_str(val):
+    """Returns a display string for a date column (stored as TEXT in SQLite)."""
     if val is None or str(val).strip() in ("", "None", "NaT"):
         return "—"
     return str(val)
@@ -606,33 +605,29 @@ for _, row in list_df.iterrows():
             COL_WIDTHS, gap="small"
         )
 
-        c0.markdown(small(safe_val(row["s_no"])),             unsafe_allow_html=True)
-        c1.markdown(small(safe_val(row["brand"])),             unsafe_allow_html=True)
-        c2.markdown(small(safe_val(row["model"])),             unsafe_allow_html=True)
-        c3.markdown(small(safe_val(row["serial_no"])),         unsafe_allow_html=True)
-        c4.markdown(small(safe_val(row["item_category"])),     unsafe_allow_html=True)
-        c5.markdown(small(safe_val(row["quantity"])),          unsafe_allow_html=True)
-        c6.markdown(small(safe_val(row["warranty_status"])),   unsafe_allow_html=True)
-        c7.markdown(small(safe_val(row["status"])),            unsafe_allow_html=True)
-        c8.markdown(small(safe_val(row.get("hand_over_to"))),  unsafe_allow_html=True)
-        c9.markdown(small(safe_date_str(row["issue_date"])),   unsafe_allow_html=True)
-        c10.markdown(small(safe_val(row.get("received_from"))),unsafe_allow_html=True)
+        c0.markdown(small(safe_val(row["s_no"])),           unsafe_allow_html=True)
+        c1.markdown(small(safe_val(row["brand"])),           unsafe_allow_html=True)
+        c2.markdown(small(safe_val(row["model"])),           unsafe_allow_html=True)
+        c3.markdown(small(safe_val(row["serial_no"])),       unsafe_allow_html=True)
+        c4.markdown(small(safe_val(row["item_category"])),   unsafe_allow_html=True)
+        c5.markdown(small(safe_val(row["quantity"])),        unsafe_allow_html=True)
+        c6.markdown(small(safe_val(row["warranty_status"])), unsafe_allow_html=True)
+        c7.markdown(small(safe_val(row["status"])),          unsafe_allow_html=True)
+        c8.markdown(small(safe_val(row.get("hand_over_to"))), unsafe_allow_html=True)
+        c9.markdown(small(safe_date_str(row["issue_date"])), unsafe_allow_html=True)
+        c10.markdown(small(safe_val(row.get("received_from"))), unsafe_allow_html=True)
         c11.markdown(small(safe_date_str(row["return_date"])), unsafe_allow_html=True)
-        c12.markdown(small(safe_val(row.get("note"))),         unsafe_allow_html=True)
-        c13.markdown(small(safe_val(row.get("status_2"))),     unsafe_allow_html=True)
+        c12.markdown(small(safe_val(row.get("note"))),       unsafe_allow_html=True)
+        c13.markdown(small(safe_val(row.get("status_2"))),   unsafe_allow_html=True)
 
         if c14.button("✏️", key=f"edit_{uid}"):
             st.session_state.edit_row = row.to_dict()
             edit_inventory_dialog()
 
         if c15.button(":material/delete:", key=f"del_{uid}"):
-            # Build a human-readable label for the confirmation prompt
-            brand_val = safe_val(row["brand"])
-            model_val = safe_val(row["model"])
-            serial_val = safe_val(row["serial_no"])
-            st.session_state.delete_id    = row["id"]
-            st.session_state.delete_label = f"{brand_val} — {model_val} (S/N: {serial_val})"
-            confirm_delete_dialog()
+            delete_inventory(row["id"])
+            st.warning("Deleted Successfully")
+            st.rerun()
 
 st.divider()
 st.caption("Inventory Management System • Dashboard")
