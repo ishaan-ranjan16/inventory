@@ -581,7 +581,7 @@ with st.container(key="header_row"):
     h12.badge("Note");      h13.badge("Status-2");    h14.badge("Edit");  h15.badge("Del.")
 
 # ==========================
-# TABLE — DATA ROWS
+# TABLE — DATA ROWS 
 # ==========================
 def small(val):
     return f'<p style="font-size:12px; margin:0">{val}</p>'
