@@ -436,6 +436,8 @@ def edit_inventory_dialog():
 # CONFIRM DELETE DIALOG
 # ==========================
 @st.dialog("🗑️ Confirm Delete")
+
+
 def confirm_delete_dialog():
     item_id    = st.session_state.delete_id
     item_label = st.session_state.delete_label
