@@ -320,47 +320,343 @@ def generate_inventory_pdf(data: pd.DataFrame) -> bytes:
 # ======================
 # ADD INVENTORY
 # ======================
+st.markdown(""" 
+            <style>
+            /* Dialog scrollbar (Chrome, Edge, Safari) */ div[data-testid="stDialog"] *::-webkit-scrollbar { width: 10px; } div[data-testid="stDialog"] *::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; } div[data-testid="stDialog"] *::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #4CAF50, #2196F3); border-radius: 10px; } div[data-testid="stDialog"] *::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #45a049, #1976D2); } /* Firefox */ div[data-testid="stDialog"] { scrollbar-width: thin; scrollbar-color: #2196F3 #f1f1f1; } </style> """, unsafe_allow_html=True)
+
+
+# @st.dialog("📝 Add Inventory")
+# def add_inventory_dialog():
+#     # with st.form("add_form", clear_on_submit=True):
+#     with st.form("add_form"):
+#         brand       = st.text_input("Brand")
+#         category    = st.text_input("Category",value="Laptop")
+#         model       = st.text_input("Model")
+#         serial_no   = st.text_input("Serial Number")
+#         qty         = st.number_input("Quantity", value=1, min_value=1)
+#         warranty    = st.text_input("Warranty Status")
+#         status      = st.text_input("Status")
+#         handover    = st.text_input("Handover To")
+#         received_from = st.text_input("Received From")
+
+#         issue_type = st.radio("Issue Date Type", ["Date", "NA"], horizontal=True, key="add_issue_type")
+#         issue_date = (
+#             st.date_input("Issue Date", value=date.today(), key="add_issue_date")
+#             if issue_type == "Date" else None
+#         )
+
+#         return_type = st.radio("Return Date Type", ["Date", "NA"], horizontal=True, key="add_return_type")
+#         return_date = (
+#             st.date_input("Return Date", value=date.today(), key="add_return_date")
+#             if return_type == "Date" else None
+#         )
+
+#         note     = st.text_area("📝 Note")
+#         status_2 = st.text_input("Status-2")
+
+#         submit = st.form_submit_button(":heavy_plus_sign: Add Item")
+
+#         # if submit:
+#         #     insert_inventory((
+#         #         brand, model, serial_no, category,
+#         #         warranty, qty, status,
+#         #         handover, issue_date,
+#         #         received_from, return_date,
+#         #         note, status_2
+#         #     ))
+#         #     st.success("Added Successfully")
+#         #     st.rerun()
+
+
+#         # if submit:
+#         #     if not brand.strip():
+#         #         st.error("Please enter Brand.")
+#         #     elif not model.strip():
+#         #         st.error("Please enter Model.")
+#         #     elif not serial_no.strip():
+#         #         st.error("Please enter Serial Number.")
+#         #     else:
+#         #         insert_inventory((
+#         #             brand, model, serial_no, category,
+#         #             warranty, qty, status,
+#         #             handover, issue_date,
+#         #             received_from, return_date,
+#         #             note, status_2
+#         #         ))
+#         #         st.success("Added Successfully")
+#         #         st.rerun()
+
+#         # if submit:
+#         #     errors = []
+
+#         #     if not brand.strip():
+#         #         errors.append("Please enter Brand.")
+
+#         #     if not model.strip():
+#         #         errors.append("Please enter Model.")
+
+#         #     if not serial_no.strip():
+#         #         errors.append("Please enter Serial Number.")
+
+
+#         #     if errors:
+#         #         for err in errors:
+#         #             st.error(err)
+#         #     else:
+#         #         insert_inventory((
+#         #             brand, model, serial_no, category,
+#         #             warranty, qty, status,
+#         #             handover, issue_date,
+#         #             received_from, return_date,
+#         #             note, status_2
+#         #         ))
+#         #         st.success("Added Successfully")
+#         #         st.rerun()
+
+#         # if submit:
+#         #     errors = []
+
+#         # if not brand.strip():
+#         #     errors.append("Brand is required")
+
+#         # if not model.strip():
+#         #     errors.append("Model is required")
+
+#         # if not serial_no.strip():
+#         #     errors.append("Serial Number is required")
+
+#         # if errors:
+#         #     validation_dialog(errors)
+#         #     return
+
+#         # insert_inventory((
+#         #     brand, model, serial_no, category,
+#         #     warranty, qty, status,
+#         #     handover, issue_date,
+#         #     received_from, return_date,
+#         #     note, status_2
+#         # ))
+
+#         # st.success("Added Successfully")
+#         # st.rerun()
+
+#         # if submit:
+#         #     errors = []
+
+#         # if not brand.strip():
+#         #     errors.append("Brand is required")
+
+#         # if not model.strip():
+#         #     errors.append("Model is required")
+
+#         # if not serial_no.strip():
+#         #     errors.append("Serial Number is required")
+
+
+#         # if errors:
+#         #     validation_dialog(errors)
+#         #     return
+
+#         # insert_inventory((
+#         #     brand, model, serial_no, category,
+#         #     warranty, qty, status,
+#         #     handover, issue_date,
+#         #     received_from, return_date,
+#         #     note, status_2
+#         # ))
+
+#         # st.success("Added Successfully")
+#         # st.rerun()
+
+#     if submit:
+#         errors = [msg for msg in [
+#         "Brand is required" if not brand.strip() else "",
+#         "Model is required" if not model.strip() else "",
+#         "Serial Number is required" if not serial_no.strip() else "",
+#     ] if msg]
+
+#     if errors:
+#         validation_dialog(errors)
+#         return
+
+#     insert_inventory(...)
+#     st.success("Added Successfully")
+#     st.rerun()
+
+
+# @st.dialog("📝 Add Inventory")
+# def add_inventory_dialog():
+
+#     with st.form("add_form"):
+#         # st.markdown("Brand <span style='color:red'>*</span>", unsafe_allow_html=True)
+#         # brand = st.text_input('',key="brand")
+#         # brand       = st.text_input("Brand*")
+#         st.markdown("#### Brand<span style='color:red'>*</span>", unsafe_allow_html=True)
+#         brand = st.text_input("Enter Brand", label_visibility="collapsed")
+
+#         category    = st.text_input("Category", value="Laptop")
+#         # model       = st.text_input("Model*")
+#         st.markdown("#### Model<span style='color:red'>*</span>", unsafe_allow_html=True)
+#         brand = st.text_input("Enter Model", label_visibility="collapsed")
+#         serial_no   = st.text_input("Serial Number*")
+#         qty         = st.number_input("Quantity", value=1, min_value=1)
+#         warranty    = st.text_input("Warranty Status")
+#         status      = st.text_input("Status")
+#         handover    = st.text_input("Handover To")
+#         received_from = st.text_input("Received From")
+
+#         issue_type = st.radio("Issue Date Type", ["Date", "NA"], horizontal=True, key="add_issue_type")
+#         issue_date = st.date_input("Issue Date", value=date.today()) if issue_type == "Date" else None
+
+#         return_type = st.radio("Return Date Type", ["Date", "NA"], horizontal=True, key="add_return_type")
+#         return_date = st.date_input("Return Date", value=date.today()) if return_type == "Date" else None
+
+#         note     = st.text_area("📝 Note")
+#         status_2 = st.text_input("Status-2")
+
+#         submit = st.form_submit_button("➕ Add Item")
+
+#         if submit:
+#             errors = []
+
+#             if not brand.strip():
+#                 errors.append("Please enter Brand.")
+#             if not model.strip():
+#                 errors.append("Please enter Model.")
+#             if not serial_no.strip():
+#                 errors.append("Please enter Serial Number.")
+
+#             if errors:
+#                 for e in errors:
+#                     st.error(e)
+#                 return  # STOP here if validation fails
+
+#             insert_inventory((
+#                 brand, model, serial_no, category,
+#                 warranty, qty, status,
+#                 handover, issue_date,
+#                 received_from, return_date,
+#                 note, status_2
+#             ))
+
+#             st.success("Added Successfully")
+#             st.rerun()
+
 @st.dialog("📝 Add Inventory")
 def add_inventory_dialog():
-    with st.form("add_form", clear_on_submit=True):
-        brand       = st.text_input("Brand")
-        category    = st.text_input("Category")
-        model       = st.text_input("Model")
-        serial_no   = st.text_input("Serial Number")
-        qty         = st.number_input("Quantity", value=1, min_value=1)
-        warranty    = st.text_input("Warranty Status")
-        status      = st.text_input("Status")
-        handover    = st.text_input("Handover To")
+
+    with st.form("add_form"):
+
+        st.write("Brand<span style='color:red'>*</span>", unsafe_allow_html=True)
+        brand = st.text_input("Enter Brand", label_visibility="collapsed")
+
+        category = st.text_input("Category", value="Laptop")
+
+        st.write("Model<span style='color:red'>*</span>", unsafe_allow_html=True)
+        model = st.text_input("Enter Model", label_visibility="collapsed")  # FIXED
+
+        st.write("Serial No.<span style='color:red'>*</span>", unsafe_allow_html=True)
+        serial_no = st.text_input("Enter Serial Number", label_visibility="collapsed")
+
+        # serial_no = st.text_input("Serial Number*")
+        qty = st.number_input("Quantity", value=1, min_value=1)
+        warranty = st.text_input("Warranty Status")
+        status = st.text_input("Status")
+        handover = st.text_input("Handover To")
         received_from = st.text_input("Received From")
 
-        issue_type = st.radio("Issue Date Type", ["Date", "NA"], horizontal=True, key="add_issue_type")
-        issue_date = (
-            st.date_input("Issue Date", value=date.today(), key="add_issue_date")
-            if issue_type == "Date" else None
+        issue_type = st.radio(
+            "Issue Date Type",
+            ["Date", "NA"],
+            horizontal=True,
+            key="add_issue_type"
         )
+        issue_date = st.date_input("Issue Date", value=date.today()) if issue_type == "Date" else None
 
-        return_type = st.radio("Return Date Type", ["Date", "NA"], horizontal=True, key="add_return_type")
-        return_date = (
-            st.date_input("Return Date", value=date.today(), key="add_return_date")
-            if return_type == "Date" else None
+        return_type = st.radio(
+            "Return Date Type",
+            ["Date", "NA"],
+            horizontal=True,
+            key="add_return_type"
         )
+        return_date = st.date_input("Return Date", value=date.today()) if return_type == "Date" else None
 
-        note     = st.text_area("📝 Note")
+        note = st.text_area("📝 Note")
         status_2 = st.text_input("Status-2")
 
-        submit = st.form_submit_button(":heavy_plus_sign: Add Item")
+        submit = st.form_submit_button("➕ Add Item")
 
         if submit:
+            errors = []
+
+            if not brand.strip():
+                errors.append("Please enter Brand.")
+            if not model.strip():
+                errors.append("Please enter Model.")
+            if not serial_no.strip():
+                errors.append("Please enter Serial Number.")
+
+            if errors:
+                for e in errors:
+                    st.error(e)
+                return
+
             insert_inventory((
-                brand, model, serial_no, category,
-                warranty, qty, status,
-                handover, issue_date,
-                received_from, return_date,
-                note, status_2
+                brand,
+                model,
+                serial_no,
+                category,
+                warranty,
+                qty,
+                status,
+                handover,
+                issue_date,
+                received_from,
+                return_date,
+                note,
+                status_2
             ))
+
             st.success("Added Successfully")
             st.rerun()
 
+    
+
+    # # 👇 validation + logic outside form
+    # if submit:
+    #     errors = []
+
+    #     if not brand.strip():
+    #         errors.append("Brand is required")
+    #     if not model.strip():
+    #         errors.append("Model is required")
+    #     if not serial_no.strip():
+    #         errors.append("Serial Number is required")
+
+    #     # ❌ NO validation_dialog() here anymore
+
+    #     if errors:
+    #         for e in errors:
+    #             # st.write(f"- {e}")
+    #             st.toast(f"⚠️ {e}", icon="⚠️")
+    #         return
+         
+    #         # st.toast("⚠️ Please fix the following errors:")
+
+    #     # if errors:
+    #     #     st.toast("❌ Please fix validation errors", icon="❌")
+    #     #     return
+        
+
+@st.dialog("⚠️ Validation Error")
+def validation_dialog(errors):
+    st.markdown("### Please fill the following required fields:")
+
+    for err in errors:
+        st.error(err)
+
+    if st.button("OK", use_container_width=True):
+        st.rerun()
 # ==========================
 # EDIT INVENTORY
 # ==========================
@@ -417,7 +713,7 @@ def edit_inventory_dialog():
         cancel = c2.form_submit_button("❌ Cancel")
 
     if save:
-        payload = (
+        inv_load = (
             brand, model, serial, category,
             warranty, qty, status,
             handover, issue_final,
@@ -425,7 +721,7 @@ def edit_inventory_dialog():
             note, status_2,
             row["id"]
         )
-        update_inventory(payload)
+        update_inventory(inv_load)
         st.success("Updated Successfully")
         st.rerun()
 
@@ -433,7 +729,7 @@ def edit_inventory_dialog():
         st.rerun()
 
 # ==========================
-# CONFIRM DELETE DIALOG
+# CONFIRM DELETE - DIALOG Box
 # ==========================
 @st.dialog("🗑️ Confirm Delete")
 
@@ -517,9 +813,9 @@ with excel_col:
 # METRICS
 # ==========================
 total     = len(df)
-Issued    = len(df[df["status"].str.lower().isin(["issued"])])
+Issued    = len(df[df["status"].str.lower().isin(["issued","given"])])
 Available = len(df[df["status"].str.lower().isin(["in-inventory", "inventory"])])
-Damaged   = len(df[df["status"].str.lower().isin(["damaged"])])
+Damaged   = len(df[df["status"].str.lower().isin(["damaged","maintainance"])])
 
 with st.container(key="metrics_row"):
     c1, c2, c3, c4 = st.columns(4)
@@ -534,6 +830,7 @@ with st.container(key="metrics_row"):
 if st.session_state.get("do_clear_search"):
     st.session_state.search_box = ""
     st.session_state.do_clear_search = False
+    st.rerun()
 
 COL_WIDTHS = [0.7, 0.8, 1.2, 1.0, 0.9, 0.9, 1.3, 1.2, 1.3, 1.1, 1.5, 1.3, 1.6, 1.2, 0.6, 0.6]
 SEARCH_ROW_WIDTHS = [sum(COL_WIDTHS[:14]), sum(COL_WIDTHS[14:])]
@@ -550,19 +847,31 @@ with search_col:
     )
 
 with refresh_col:
-    if st.button(":material/refresh:", key="refresh_btn", use_container_width=True):
+    if st.button("Refresh",icon= ":material/refresh:", key="refresh_btn", use_container_width=True):
         st.session_state.do_clear_search = True
         st.rerun()
 
-list_df = df.copy()
+# list_df = df.copy()
 
-if search2:
-    list_df = list_df[
-        list_df.apply(
-            lambda r: r.astype(str).str.contains(search2, case=False, na=False).any(),
-            axis=1
-        )
-    ]
+# if search2:
+#     list_df = list_df[
+#         list_df.apply(
+#             lambda r: r.astype(str).str.contains(search2, case=False, na=False).any(),
+#             axis=1
+#         )
+#     ]
+
+# list_df = list_df.reset_index(drop=True)
+# list_df["s_no"] = list_df.index + 1
+
+list_df = df.copy().fillna("")
+
+if search2 and search2.strip():
+    mask = list_df.astype(str).apply(
+        lambda col: col.str.contains(search2, case=False, na=False, regex=False)
+    ).any(axis=1)
+
+    list_df = list_df[mask]
 
 list_df = list_df.reset_index(drop=True)
 list_df["s_no"] = list_df.index + 1
@@ -596,7 +905,7 @@ def safe_val(val):
     return val
 
 def safe_date_str(val):
-    if val is None or str(val).strip() in ("", "None", "NaT"):
+    if val is None or str(val).strip() in ("", "None", "NaT","NAN","NaN",):
         return "—"
     return str(val)
 
@@ -608,7 +917,7 @@ for _, row in list_df.iterrows():
             COL_WIDTHS, gap="small"
         )
 
-        c0.markdown(small(safe_val(row["s_no"])),             unsafe_allow_html=True)
+        c0.markdown(small(safe_val(row["s_no"])),              unsafe_allow_html=True)
         c1.markdown(small(safe_val(row["brand"])),             unsafe_allow_html=True)
         c2.markdown(small(safe_val(row["model"])),             unsafe_allow_html=True)
         c3.markdown(small(safe_val(row["serial_no"])),         unsafe_allow_html=True)
@@ -633,7 +942,7 @@ for _, row in list_df.iterrows():
             model_val = safe_val(row["model"])
             serial_val = safe_val(row["serial_no"])
             st.session_state.delete_id    = row["id"]
-            st.session_state.delete_label = f"{brand_val} — {model_val} (S/N: {serial_val})"
+            st.session_state.delete_label = f"{brand_val} — {model_val} (S/No: {serial_val})"
             confirm_delete_dialog()
 
 st.divider()
