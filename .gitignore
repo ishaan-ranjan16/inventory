@@ -6,6 +6,7 @@ __pycache__/
 *.sqlite3
 *.pyo
 .pytest_cache/
+tests/
 
 # Ignore the test script
 test.py
