@@ -1,6 +1,8 @@
 from datetime import date
 
-from tests.inventory_core import safe_date
+# from tests.inventory_core import safe_date
+from inventory_core import safe_date
+
 
 
 def test_safe_date_none():
