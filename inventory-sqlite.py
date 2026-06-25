@@ -427,7 +427,8 @@ def edit_inventory_dialog():
             handover, issue_final,
             received, return_final,
             note, status_2,
-            row["serial_no"]   # WHERE clause
+            row["id"]   
+            # row["serial_no"]   # WHERE clause
         )
         update_inventory(payload)
         st.success("Updated Successfully")
