@@ -1,10 +1,21 @@
 import sqlite3
+import tempfile
 import pytest
 from unittest.mock import patch
 
+
 @pytest.fixture
 def test_db():
-    conn = sqlite3.connect(":memory:")
+
+    temp_db = tempfile.NamedTemporaryFile(
+        suffix=".db",
+        delete=False
+    )
+
+    db_path = temp_db.name
+
+    conn = sqlite3.connect(db_path)
+
     cur = conn.cursor()
 
     cur.execute("""
@@ -27,8 +38,13 @@ def test_db():
     """)
 
     conn.commit()
-
-    with patch("inventory.get_connection", return_value=conn):
-        yield conn
-
     conn.close()
+
+    def get_test_connection():
+        return sqlite3.connect(db_path)
+
+    with patch(
+        "inventory_core.get_connection",
+        side_effect=get_test_connection
+    ):
+        yield
