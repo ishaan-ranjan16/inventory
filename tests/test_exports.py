@@ -1,6 +1,6 @@
 import pandas as pd
 
-from inventory_core import (
+from tests.inventory_core import (
     generate_inventory_excel,
     generate_inventory_pdf,
 )

@@ -1,4 +1,4 @@
-from inventory_core import (
+from tests.inventory_core import (
     insert_inventory,
     update_inventory,
     fetch_inventory,
