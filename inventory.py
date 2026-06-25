@@ -628,7 +628,7 @@ for _, row in list_df.iterrows():
             edit_inventory_dialog()
 
         if c15.button(":material/delete:", key=f"del_{uid}"):
-            # Build a human-readable label for the confirmation prompt
+            # Label for the confirmation prompt
             brand_val = safe_val(row["brand"])
             model_val = safe_val(row["model"])
             serial_val = safe_val(row["serial_no"])
