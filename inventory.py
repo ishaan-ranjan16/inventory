@@ -553,7 +553,7 @@ def add_inventory_dialog():
             st.markdown("Brand <span style='color:red'>*</span>", unsafe_allow_html=True)
             st.text_input("Enter Brand", label_visibility="collapsed", key="add_brand")
             if "brand" in errors:
-                st.error(errors["brand"])
+                st.write(errors["brand"])
 
         with r1c2:
             st.text_input("Category", value="Laptop", key="add_category")
@@ -562,13 +562,13 @@ def add_inventory_dialog():
             st.markdown("Model <span style='color:red'>*</span>", unsafe_allow_html=True)
             st.text_input("Enter Model", label_visibility="collapsed", key="add_model")
             if "model" in errors:
-                st.error(errors["model"])
+                st.write(errors["model"])
 
         with r1c4:
             st.markdown("Serial No. <span style='color:red'>*</span>", unsafe_allow_html=True)
             st.text_input("Enter Serial Number", label_visibility="collapsed", key="add_serial")
             if "serial" in errors:
-                st.error(errors["serial"])
+                st.write(errors["serial"])
 
         st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
 
