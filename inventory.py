@@ -4,6 +4,7 @@ from datetime import date
 import io
 from db_connection import get_connection
 
+import time
 from datetime import datetime
 
 from reportlab.lib.pagesizes import landscape, A4
@@ -621,35 +622,815 @@ st.markdown("""
 #             st.rerun()
 
 
+
+
+# @st.dialog("📝 Add Inventory", width="large")
+# def add_inventory_dialog():
+#     with st.form("add_form"):
+
+#         # ---------------- Row 1 ----------------
+#         r1c1, r1c2, r1c3, r1c4 = st.columns(4)
+
+#         with r1c1:
+#             st.write("Brand <span style='color:red'>*</span>", unsafe_allow_html=True)
+#             brand = st.text_input(
+#                 "Enter Brand",
+#                 label_visibility="collapsed",
+#                 key="add_brand",
+#             )
+
+#         with r1c2:
+#             category = st.text_input(
+#                 "Category",
+#                 value="Laptop",
+#                 key="add_category",
+#             )
+
+#         with r1c3:
+#             st.write("Model <span style='color:red'>*</span>", unsafe_allow_html=True)
+#             model = st.text_input(
+#                 "Enter Model",
+#                 label_visibility="collapsed",
+#                 key="add_model",
+#             )
+
+#         with r1c4:
+#             st.write("Serial No. <span style='color:red'>*</span>", unsafe_allow_html=True)
+#             serial_no = st.text_input(
+#                 "Enter Serial Number",
+#                 label_visibility="collapsed",
+#                 key="add_serial",
+#             )
+
+#         st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
+
+#         # ---------------- Row 2 ----------------
+#         r2c1, r2c2, r2c3, r2c4 = st.columns(4)
+
+#         with r2c1:
+#             qty = st.number_input(
+#                 "Quantity",
+#                 min_value=1,
+#                 value=1,
+#                 key="add_qty",
+#             )
+
+#         with r2c2:
+#             warranty = st.text_input(
+#                 "Warranty Status",
+#                 key="add_warranty",
+#             )
+
+#         with r2c3:
+#             status = st.text_input(
+#                 "Status",
+#                 key="add_status",
+#             )
+
+#         with r2c4:
+#             status_2 = st.text_input(
+#                 "Status-2",
+#                 key="add_status2",
+#             )
+
+#         st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
+
+#         # ---------------- Row 3 ----------------
+#         r3c1, r3c2 = st.columns(2)
+
+#         with r3c1:
+#             handover = st.text_input(
+#                 "Handover To",
+#                 key="add_handover",
+#             )
+
+#         with r3c2:
+#             received_from = st.text_input(
+#                 "Received From",
+#                 key="add_received",
+#             )
+
+#         st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
+
+#         # ---------------- Row 4 ----------------
+#         r4c1, r4c2 = st.columns(2)
+
+#         with r4c1:
+#             issue_type = st.radio(
+#                 "Issue Date",
+#                 ["Date", "NA"],
+#                 horizontal=True,
+#                 key="add_issue_type",
+#             )
+
+#             issue_date = (
+#                 st.date_input(
+#                     "Issue Date",
+#                     value=date.today(),
+#                     key="add_issue_date",
+#                     label_visibility="collapsed",
+#                 )
+#                 if issue_type == "Date"
+#                 else None
+#             )
+
+#         with r4c2:
+#             return_type = st.radio(
+#                 "Return Date",
+#                 ["Date", "NA"],
+#                 horizontal=True,
+#                 key="add_return_type",
+#             )
+
+#             return_date = (
+#                 st.date_input(
+#                     "Return Date",
+#                     value=date.today(),
+#                     key="add_return_date",
+#                     label_visibility="collapsed",
+#                 )
+#                 if return_type == "Date"
+#                 else None
+#             )
+
+#         st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
+
+#         # ---------------- Row 5 ----------------
+#         note = st.text_area(
+#             "📝 Note",
+#             key="add_note",
+#             height=80,
+#         )
+
+#         # ---------------- Buttons ----------------
+#         col1, col2 = st.columns(2)
+
+#         with col2:
+#             cancel = st.form_submit_button(
+#                 "❌ Cancel",
+#                 use_container_width=True,
+#             )
+
+#         with col1:
+#             submit = st.form_submit_button(
+#                 "➕ Add Item",
+#                 use_container_width=True,
+#             )
+
+#     # ---------------- Cancel ----------------
+#     if cancel:
+#         st.rerun()
+
+#     # ---------------- Submit ----------------
+#     if submit:
+#         errors = []
+
+#         if not brand.strip():
+#             errors.append("Brand is required.")
+
+#         if not model.strip():
+#             errors.append("Model is required.")
+
+#         if not serial_no.strip():
+#             errors.append("Serial Number is required.")
+
+#         if errors:
+#             validation_dialog(errors)
+#             return
+
+#         insert_inventory(
+#             (
+#                 brand,
+#                 model,
+#                 serial_no,
+#                 category,
+#                 warranty,
+#                 qty,
+#                 status,
+#                 handover,
+#                 issue_date,
+#                 received_from,
+#                 return_date,
+#                 note,
+#                 status_2,
+#             )
+#         )
+
+#         st.success("✅ Added Successfully")
+#         st.rerun()
+
+# @st.dialog("⚠️ Validation Error")
+# def validation_dialog(errors):
+#     st.markdown("### Please fill the following required fields:")
+
+#     for err in errors:
+#         st.error(err)
+
+#     if st.button("OK", use_container_width=True):
+#         st.rerun()
+
+
+
+
+
+
+# latest --
+
+# @st.dialog("📝 Add Inventory", width="large")
+# def add_inventory_dialog():
+
+#     # ── Inline validation errors (shown above the form on rerun) ──
+#     if st.session_state.get("add_form_errors"):
+#         for err in st.session_state["add_form_errors"]:
+#             st.error(err)
+#         st.session_state["add_form_errors"] = []
+
+#     with st.form("add_form"):
+
+#         # ---------------- Row 1 ----------------
+#         r1c1, r1c2, r1c3, r1c4 = st.columns(4)
+
+#         with r1c1:
+#             st.write("Brand <span style='color:red'>*</span>", unsafe_allow_html=True)
+#             brand = st.text_input(
+#                 "Enter Brand",
+#                 label_visibility="collapsed",
+#                 key="add_brand",
+#             )
+
+#         with r1c2:
+#             category = st.text_input(
+#                 "Category",
+#                 value="Laptop",
+#                 key="add_category",
+#             )
+
+#         with r1c3:
+#             st.write("Model <span style='color:red'>*</span>", unsafe_allow_html=True)
+#             model = st.text_input(
+#                 "Enter Model",
+#                 label_visibility="collapsed",
+#                 key="add_model",
+#             )
+
+#         with r1c4:
+#             st.write("Serial No. <span style='color:red'>*</span>", unsafe_allow_html=True)
+#             serial_no = st.text_input(
+#                 "Enter Serial Number",
+#                 label_visibility="collapsed",
+#                 key="add_serial",
+#             )
+
+#         st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
+
+#         # ---------------- Row 2 ----------------
+#         r2c1, r2c2, r2c3, r2c4 = st.columns(4)
+
+#         with r2c1:
+#             qty = st.number_input(
+#                 "Quantity",
+#                 min_value=1,
+#                 value=1,
+#                 key="add_qty",
+#             )
+
+#         with r2c2:
+#             warranty = st.text_input(
+#                 "Warranty Status",
+#                 key="add_warranty",
+#             )
+
+#         with r2c3:
+#             status = st.text_input(
+#                 "Status",
+#                 key="add_status",
+#             )
+
+#         with r2c4:
+#             status_2 = st.text_input(
+#                 "Status-2",
+#                 key="add_status2",
+#             )
+
+#         st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
+
+#         # ---------------- Row 3 ----------------
+#         r3c1, r3c2 = st.columns(2)
+
+#         with r3c1:
+#             handover = st.text_input(
+#                 "Handover To",
+#                 key="add_handover",
+#             )
+
+#         with r3c2:
+#             received_from = st.text_input(
+#                 "Received From",
+#                 key="add_received",
+#             )
+
+#         st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
+
+#         # ---------------- Row 4 ----------------
+#         r4c1, r4c2 = st.columns(2)
+
+#         with r4c1:
+#             issue_type = st.radio(
+#                 "Issue Date",
+#                 ["Date", "NA"],
+#                 horizontal=True,
+#                 key="add_issue_type",
+#             )
+
+#             issue_date = (
+#                 st.date_input(
+#                     "Issue Date",
+#                     value=date.today(),
+#                     key="add_issue_date",
+#                     label_visibility="collapsed",
+#                 )
+#                 if issue_type == "Date"
+#                 else None
+#             )
+
+#         with r4c2:
+#             return_type = st.radio(
+#                 "Return Date",
+#                 ["Date", "NA"],
+#                 horizontal=True,
+#                 key="add_return_type",
+#             )
+
+#             return_date = (
+#                 st.date_input(
+#                     "Return Date",
+#                     value=date.today(),
+#                     key="add_return_date",
+#                     label_visibility="collapsed",
+#                 )
+#                 if return_type == "Date"
+#                 else None
+#             )
+
+#         st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
+
+#         # ---------------- Row 5 ----------------
+#         note = st.text_area(
+#             "📝 Note",
+#             key="add_note",
+#             height=80,
+#         )
+
+#         # ---------------- Buttons ----------------
+#         col1, col2 = st.columns(2)
+
+#         with col2:
+#             cancel = st.form_submit_button(
+#                 "❌ Cancel",
+#                 use_container_width=True,
+#             )
+
+#         with col1:
+#             submit = st.form_submit_button(
+#                 "➕ Add Item",
+#                 use_container_width=True,
+#             )
+
+#     # ---------------- Cancel ----------------
+#     if cancel:
+#         st.rerun()
+
+#     # ---------------- Submit ----------------
+#     if submit:
+#         errors = []
+
+#         if not brand.strip():
+#             errors.append("Brand is required.")
+
+#         if not model.strip():
+#             errors.append("Model is required.")
+
+#         if not serial_no.strip():
+#             errors.append("Serial Number is required.")
+
+#         if errors:
+#             for err in errors:
+#                 st.error(err)
+#         else:
+#             insert_inventory(
+#                 (
+#                     brand,
+#                     model,
+#                     serial_no,
+#                     category,
+#                     warranty,
+#                     qty,
+#                     status,
+#                     handover,
+#                     issue_date,
+#                     received_from,
+#                     return_date,
+#                     note,
+#                     status_2,
+#                 )
+#             )
+#             st.success("✅ Added Successfully")
+#             st.rerun()
+
+
+# @st.dialog("📝 Add Inventory", width="large")
+# def add_inventory_dialog():
+
+#     errors = []  # 👈 local errors (NO session_state, NO rerun)
+
+#     with st.form("add_form"):
+
+#         # ---------------- Row 1 ----------------
+#         r1c1, r1c2, r1c3, r1c4 = st.columns(4)
+
+#         with r1c1:
+#             st.write("Brand <span style='color:red'>*</span>", unsafe_allow_html=True)
+#             brand = st.text_input("Enter Brand", label_visibility="collapsed", key="add_brand")
+
+#         with r1c2:
+#             category = st.text_input("Category", value="Laptop", key="add_category")
+
+#         with r1c3:
+#             st.write("Model <span style='color:red'>*</span>", unsafe_allow_html=True)
+#             model = st.text_input("Enter Model", label_visibility="collapsed", key="add_model")
+
+#         with r1c4:
+#             st.write("Serial No. <span style='color:red'>*</span>", unsafe_allow_html=True)
+#             serial_no = st.text_input("Enter Serial Number", label_visibility="collapsed", key="add_serial")
+
+#         st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
+
+#         # ---------------- Row 2 ----------------
+#         r2c1, r2c2, r2c3, r2c4 = st.columns(4)
+
+#         with r2c1:
+#             qty = st.number_input("Quantity", min_value=1, value=1, key="add_qty")
+
+#         with r2c2:
+#             warranty = st.text_input("Warranty Status", key="add_warranty")
+
+#         with r2c3:
+#             status = st.text_input("Status", key="add_status")
+
+#         with r2c4:
+#             status_2 = st.text_input("Status-2", key="add_status2")
+
+#         st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
+
+#         # ---------------- Row 3 ----------------
+#         r3c1, r3c2 = st.columns(2)
+
+#         with r3c1:
+#             handover = st.text_input("Handover To", key="add_handover")
+
+#         with r3c2:
+#             received_from = st.text_input("Received From", key="add_received")
+
+#         st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
+
+#         # ---------------- Row 4 ----------------
+#         r4c1, r4c2 = st.columns(2)
+
+#         with r4c1:
+#             issue_type = st.radio("Issue Date", ["Date", "NA"], horizontal=True, key="add_issue_type")
+
+#             issue_date = (
+#                 st.date_input("Issue Date", value=date.today(), key="add_issue_date", label_visibility="collapsed")
+#                 if issue_type == "Date"
+#                 else None
+#             )
+
+#         with r4c2:
+#             return_type = st.radio("Return Date", ["Date", "NA"], horizontal=True, key="add_return_type")
+
+#             return_date = (
+#                 st.date_input("Return Date", value=date.today(), key="add_return_date", label_visibility="collapsed")
+#                 if return_type == "Date"
+#                 else None
+#             )
+
+#         st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
+
+#         # ---------------- Row 5 ----------------
+#         note = st.text_area("📝 Note", key="add_note", height=80)
+
+#         # ---------------- Buttons ----------------
+#         col1, col2 = st.columns(2)
+
+#         with col2:
+#             cancel = st.form_submit_button("❌ Cancel", use_container_width=True)
+
+#         with col1:
+#             submit = st.form_submit_button("➕ Add Item", use_container_width=True)
+
+#     # ---------------- CANCEL ----------------
+#     if cancel:
+#         return  # just close dialog
+
+#     # ---------------- VALIDATION ----------------
+#     if submit:
+
+#         if not brand.strip():
+#             errors.append("Brand is required.")
+
+#         if not model.strip():
+#             errors.append("Model is required.")
+
+#         if not serial_no.strip():
+#             errors.append("Serial Number is required.")
+
+#         # ---------------- SHOW ERRORS AT TOP (INSIDE DIALOG) ----------------
+#         if errors:
+#             for err in errors:
+#                 st.error(err)
+#             return  # stop here, DO NOT rerun
+
+#         # ---------------- SUCCESS ----------------
+#         insert_inventory(
+#             (
+#                 brand,
+#                 model,
+#                 serial_no,
+#                 category,
+#                 warranty,
+#                 qty,
+#                 status,
+#                 handover,
+#                 issue_date,
+#                 received_from,
+#                 return_date,
+#                 note,
+#                 status_2,
+#             )
+#         )
+
+#         st.success("✅ Added Successfully")
+
+#_______________________--
+
+# # Ensure session_state exists
+# if "add_errors" not in st.session_state:
+#     st.session_state.add_errors = {}
+
+
+# @st.dialog("📝 Add Inventory", width="large")
+# def add_inventory_dialog():
+
+#     errors = st.session_state.add_errors
+
+#     with st.form("add_form"):
+
+#         # ---------------- Row 1 ----------------
+#         r1c1, r1c2, r1c3, r1c4 = st.columns(4)
+
+#         with r1c1:
+#             st.write("Brand <span style='color:red'>*</span>", unsafe_allow_html=True)
+#             brand = st.text_input(
+#                 "Enter Brand",
+#                 label_visibility="collapsed",
+#                 key="add_brand",
+#             )
+#             if "brand" in errors:
+#                 st.error(errors["brand"])
+
+#         with r1c2:
+#             category = st.text_input(
+#                 "Category",
+#                 value="Laptop",
+#                 key="add_category",
+#             )
+
+#         with r1c3:
+#             st.write("Model <span style='color:red'>*</span>", unsafe_allow_html=True)
+#             model = st.text_input(
+#                 "Enter Model",
+#                 label_visibility="collapsed",
+#                 key="add_model",
+#             )
+#             if "model" in errors:
+#                 st.error(errors["model"])
+
+#         with r1c4:
+#             st.write("Serial No. <span style='color:red'>*</span>", unsafe_allow_html=True)
+#             serial_no = st.text_input(
+#                 "Enter Serial Number",
+#                 label_visibility="collapsed",
+#                 key="add_serial",
+#             )
+#             if "serial" in errors:
+#                 st.error(errors["serial"])
+
+#         st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
+
+#         # ---------------- Row 2 ----------------
+#         r2c1, r2c2, r2c3, r2c4 = st.columns(4)
+
+#         with r2c1:
+#             qty = st.number_input("Quantity", min_value=1, value=1, key="add_qty")
+
+#         with r2c2:
+#             warranty = st.text_input("Warranty Status", key="add_warranty")
+
+#         with r2c3:
+#             status = st.text_input("Status", key="add_status")
+
+#         with r2c4:
+#             status_2 = st.text_input("Status-2", key="add_status2")
+
+#         st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
+
+#         # ---------------- Row 3 ----------------
+#         r3c1, r3c2 = st.columns(2)
+
+#         with r3c1:
+#             handover = st.text_input("Handover To", key="add_handover")
+
+#         with r3c2:
+#             received_from = st.text_input("Received From", key="add_received")
+
+#         st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
+
+#         # ---------------- Row 4 ----------------
+#         r4c1, r4c2 = st.columns(2)
+
+#         with r4c1:
+#             issue_type = st.radio(
+#                 "Issue Date",
+#                 ["Date", "NA"],
+#                 horizontal=True,
+#                 key="add_issue_type",
+#             )
+
+#             issue_date = (
+#                 st.date_input(
+#                     "Issue Date",
+#                     value=date.today(),
+#                     key="add_issue_date",
+#                     label_visibility="collapsed",
+#                 )
+#                 if issue_type == "Date"
+#                 else None
+#             )
+
+#         with r4c2:
+#             return_type = st.radio(
+#                 "Return Date",
+#                 ["Date", "NA"],
+#                 horizontal=True,
+#                 key="add_return_type",
+#             )
+
+#             return_date = (
+#                 st.date_input(
+#                     "Return Date",
+#                     value=date.today(),
+#                     key="add_return_date",
+#                     label_visibility="collapsed",
+#                 )
+#                 if return_type == "Date"
+#                 else None
+#             )
+
+#         st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
+
+#         # ---------------- Row 5 ----------------
+#         note = st.text_area("📝 Note", key="add_note", height=80)
+
+#         # ---------------- Buttons ----------------
+#         col1, col2 = st.columns(2)
+
+#         with col2:
+#             cancel = st.form_submit_button("❌ Cancel", use_container_width=True)
+
+#         with col1:
+#             submit = st.form_submit_button("➕ Add Item", use_container_width=True)
+
+#     # ---------------- CANCEL ----------------
+#     if cancel:
+#         st.session_state.add_errors = {}
+#         # return
+#         st.rerun()
+
+#     # ---------------- VALIDATION ----------------
+#     if submit:
+
+#         errors = {}
+
+#         if not brand.strip():
+#             errors["brand"] = "Brand is required."
+
+#         if not model.strip():
+#             errors["model"] = "Model is required."
+
+#         if not serial_no.strip():
+#             errors["serial"] = "Serial Number is required."
+
+#         st.session_state.add_errors = errors
+
+#         # Stop if errors exist (prevents insert)
+#         if errors:
+#             st.warning('Please enter the required field before submitting.')
+#             # st.stop()
+#             return
+#             st.success("Added Successfully")
+#             # return
+#             # st.stop()
+
+#         # ---------------- SUCCESS ----------------
+#         insert_inventory(
+#             (
+#                 brand,
+#                 model,
+#                 serial_no,
+#                 category,
+#                 warranty,
+#                 qty,
+#                 status,
+#                 handover,
+#                 issue_date,
+#                 received_from,
+#                 return_date,
+#                 note,
+#                 status_2,
+#             )
+#         )
+
+#         st.session_state.add_errors = {}
+#         st.success("✅ Added Successfully")
+#         st.rerun()
+
+# ---------------- SESSION STATE INIT ----------------
+if "add_errors" not in st.session_state:
+    st.session_state.add_errors = {}
+
+
+# ---------------- VALIDATION ----------------
+def validate_inventory(data):
+    errors = {}
+
+    if not (data["brand"] or "").strip():
+        errors["brand"] = "Brand is required."
+
+    if not (data["model"] or "").strip():
+        errors["model"] = "Model is required."
+
+    if not (data["serial"] or "").strip():
+        errors["serial"] = "Serial Number is required."
+
+    return errors
+
+
+# ---------------- DIALOG ----------------
 @st.dialog("📝 Add Inventory", width="large")
 def add_inventory_dialog():
+
+    errors = st.session_state.add_errors
+
+    # 🔔 Global warning (stable, not flickering)
+    if errors:
+        st.warning("⚠️ Please fix the highlighted fields below.")
+
     with st.form("add_form"):
 
-        # — Row 1: Brand | Category | Model | Serial No —
+        # ---------------- Row 1 ----------------
         r1c1, r1c2, r1c3, r1c4 = st.columns(4)
 
         with r1c1:
-            st.write("Brand <span style='color:red'>*</span>", unsafe_allow_html=True)
-            brand = st.text_input("Enter Brand", label_visibility="collapsed", key="add_brand")
+            st.markdown("Brand <span style='color:red'>*</span>", unsafe_allow_html=True)
+            brand = st.text_input("Enter Brand", placeholder="Enter Brand",
+                                  label_visibility="collapsed", key="add_brand")
+            if "brand" in errors:
+                st.error(errors["brand"])
 
         with r1c2:
             category = st.text_input("Category", value="Laptop", key="add_category")
 
         with r1c3:
-            st.write("Model <span style='color:red'>*</span>", unsafe_allow_html=True)
-            model = st.text_input("Enter Model", label_visibility="collapsed", key="add_model")
+            st.markdown("Model <span style='color:red'>*</span>", unsafe_allow_html=True)
+            model = st.text_input("Enter Model", placeholder="Enter Model",
+                                  label_visibility="collapsed", key="add_model")
+            if "model" in errors:
+                st.error(errors["model"])
 
         with r1c4:
-            st.write("Serial No. <span style='color:red'>*</span>", unsafe_allow_html=True)
-            serial_no = st.text_input("Enter Serial Number", label_visibility="collapsed", key="add_serial")
+            st.markdown("Serial No. <span style='color:red'>*</span>", unsafe_allow_html=True)
+            serial_no = st.text_input("Enter Serial Number", placeholder="Enter Serial Number",
+                                       label_visibility="collapsed", key="add_serial")
+            if "serial" in errors:
+                st.error(errors["serial"])
 
-        st.markdown("<hr style='margin: 6px 0;'>", unsafe_allow_html=True)
+        st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
 
-        # — Row 2: Quantity | Warranty | Status | Status-2 —
+        # ---------------- Row 2 ----------------
         r2c1, r2c2, r2c3, r2c4 = st.columns(4)
 
         with r2c1:
-            qty = st.number_input("Quantity", value=1, min_value=1, key="add_qty")
+            qty = st.number_input("Quantity", min_value=1, value=1, key="add_qty")
 
         with r2c2:
             warranty = st.text_input("Warranty Status", key="add_warranty")
@@ -660,9 +1441,9 @@ def add_inventory_dialog():
         with r2c4:
             status_2 = st.text_input("Status-2", key="add_status2")
 
-        st.markdown("<hr style='margin: 6px 0;'>", unsafe_allow_html=True)
+        st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
 
-        # — Row 3: Handover To | Received From —
+        # ---------------- Row 3 ----------------
         r3c1, r3c2 = st.columns(2)
 
         with r3c1:
@@ -671,105 +1452,1490 @@ def add_inventory_dialog():
         with r3c2:
             received_from = st.text_input("Received From", key="add_received")
 
-        st.markdown("<hr style='margin: 6px 0;'>", unsafe_allow_html=True)
+        st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
 
-        # — Row 4: Issue Date | Return Date —
+        # ---------------- Row 4 ----------------
         r4c1, r4c2 = st.columns(2)
 
         with r4c1:
-            issue_type = st.radio(
-                "Issue Date",
-                ["Date", "NA"],
-                horizontal=True,
-                key="add_issue_type"
-            )
+            issue_type = st.radio("Issue Date", ["Date", "NA"],
+                                  horizontal=True, key="add_issue_type")
+
             issue_date = (
-                st.date_input("Issue Date", value=date.today(), key="add_issue_date",
-                              label_visibility="collapsed")
-                if issue_type == "Date" else None
+                st.date_input("Issue Date", value=date.today(),
+                              key="add_issue_date", label_visibility="collapsed")
+                if issue_type == "Date"
+                else None
             )
 
         with r4c2:
-            return_type = st.radio(
-                "Return Date",
-                ["Date", "NA"],
-                horizontal=True,
-                key="add_return_type"
-            )
+            return_type = st.radio("Return Date", ["Date", "NA"],
+                                   horizontal=True, key="add_return_type")
+
             return_date = (
-                st.date_input("Return Date", value=date.today(), key="add_return_date",
-                              label_visibility="collapsed")
-                if return_type == "Date" else None
+                st.date_input("Return Date", value=date.today(),
+                              key="add_return_date", label_visibility="collapsed")
+                if return_type == "Date"
+                else None
             )
 
-        st.markdown("<hr style='margin: 6px 0;'>", unsafe_allow_html=True)
+        st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
 
-        # — Row 5: Note (full width) —
+        # ---------------- ROW 5 ----------------
         note = st.text_area("📝 Note", key="add_note", height=80)
 
-        submit = st.form_submit_button("➕ Add Item", use_container_width=True)
+        # ---------------- BUTTONS ----------------
+        col1, col2 = st.columns(2)
 
+        with col2:
+            cancel = st.form_submit_button("❌ Cancel", use_container_width=True)
+
+        with col1:
+            submit = st.form_submit_button("➕ Add Item", use_container_width=True)
+
+    # ---------------- CANCEL ----------------
+    if cancel:
+        st.session_state.add_errors = {}
+
+        for k in list(st.session_state.keys()):
+            if k.startswith("add_"):
+                del st.session_state[k]
+
+        st.rerun()
+        return
+
+    # ---------------- SUBMIT ----------------
+    # if submit:
+
+    #     data = {
+    #         "brand": brand,
+    #         "model": model,
+    #         "serial": serial_no,
+    #     }
+
+    #     errors = validate_inventory(data)
+    #     st.session_state.add_errors = errors
+
+    #     # ❌ INVALID → rerun to show errors in UI
+    #     if errors:
+    #         st.stop()
+    #         st.rerun()
+    #         return
+
+    #     # ---------------- SUCCESS ----------------
+    #     insert_inventory(
+    #         (
+    #             brand,
+    #             model,
+    #             serial_no,
+    #             category,
+    #             warranty,
+    #             qty,
+    #             status,
+    #             handover,
+    #             issue_date,
+    #             received_from,
+    #             return_date,
+    #             note,
+    #             status_2,
+    #         )
+    #     )
+
+    #     st.session_state.add_errors = {}
+
+    #     for k in list(st.session_state.keys()):
+    #         if k.startswith("add_"):
+    #             del st.session_state[k]
+
+    #     st.success("✅ Added Successfully")
+    #     st.rerun()
+    if submit:
+        data = {
+            "brand": brand,
+            "model": model,
+            "serial": serial_no,
+            }
+        errors = validate_inventory(data)
+        st.session_state.add_errors = errors
+        
+        if errors:
+            st.rerun()   # 🔥 just rerun, no stop needed
+            return
+        # SUCCESS
+        # # ---------------- SUCCESS ----------------
+        # data = {
+        #     "brand": brand.strip(),
+        #     "model": model.strip(),
+        #     "serial": serial_no.strip(),
+        #     "category": category,
+        #     "warranty": warranty,
+        #     "qty": qty,
+        #     "status": status,
+        #     "status_2": status_2,
+        #     "handover": handover,
+        #     "received_from": received_from,
+        #     "issue_date": issue_date,
+        #     "return_date": return_date,
+        #     "note": note,
+        # }
+
+        # # 👉 SAVE DATA
+        # insert_inventory(data)
+
+        # # reset errors
+        # st.session_state.add_errors = {}
+
+        # # clear form state
+        # for k in list(st.session_state.keys()):
+        #     if k.startswith("add_"):
+        #         del st.session_state[k]
+
+        # st.success("✅ Inventory saved successfully!")
+        # st.rerun()
+        # ---------------- SUBMIT ----------------
         if submit:
-            errors = []
-            if not brand.strip():
-                errors.append("Please enter Brand.")
-            if not model.strip():
-                errors.append("Please enter Model.")
-            if not serial_no.strip():
-                errors.append("Please enter Serial Number.")
+
+            data = {
+                "brand": brand,
+                "model": model,
+                "serial": serial_no,
+            }
+
+            errors = validate_inventory(data)
+            st.session_state.add_errors = errors
 
             if errors:
-                for e in errors:
-                    st.error(e)
+                st.rerun()
                 return
 
-            insert_inventory((
-                brand, model, serial_no, category,
-                warranty, qty, status,
-                handover, issue_date,
-                received_from, return_date,
-                note, status_2
-            ))
-            st.success("✅ Added Successfully")
-            st.rerun()
+            # ✅ SAVE DATA (INSIDE DIALOG)
+            insert_inventory(
+                (
+                    brand,
+                    model,
+                    serial_no,
+                    category,
+                    warranty,
+                    qty,
+                    status,
+                    status_2,
+                    handover,
+                    received_from,
+                    issue_date,
+                    return_date,
+                    note,
+                )
+            )
 
-    
+            # clear errors
+            st.session_state.add_errors = {}
 
-    # # 👇 validation + logic outside form
+            # clear form state
+            for k in list(st.session_state.keys()):
+                if k.startswith("add_"):
+                    del st.session_state[k]
+
+            st.success("✅ Saved successfully!")
+            time.sleep(0.5)
+            st.rerun()   # 🔥 THIS closes dialog automatically
+        # insert_inventory(
+        #     (
+        #         brand,
+        #         model,
+        #         serial_no,
+        #         category,
+        #         warranty,
+        #         qty,
+        #         status,
+        #         handover,
+        #         issue_date,
+        #         received_from,
+        #         return_date,
+        #         note,
+        #         status_2,
+        #         )
+        # )
+        # st.session_state.add_errors = {}
+        
+        # for k in list(st.session_state.keys()):
+        #     if k.startswith("add_"):
+        #         del st.session_state[k]
+                
+        #         st.success("✅ Added Successfully")
+        #         st.rerun()
+
+# # Ensure session_state exists
+# if "add_errors" not in st.session_state:
+#     st.session_state.add_errors = {}
+
+
+# def validate_inventory(data):
+#     errors = {}
+
+#     if not (data["brand"] or "").strip():
+#         errors["brand"] = "Brand is required."
+
+#     if not (data["model"] or "").strip():
+#         errors["model"] = "Model is required."
+
+#     if not (data["serial"] or "").strip():
+#         errors["serial"] = "Serial Number is required."
+
+#     return errors
+
+
+# @st.dialog("📝 Add Inventory", width="large")
+# def add_inventory_dialog():
+
+#     errors = st.session_state.add_errors
+
+#     with st.form("add_form"):
+
+#         # ---------------- Row 1 ----------------
+#         r1c1, r1c2, r1c3, r1c4 = st.columns(4)
+
+#         with r1c1:
+#             st.markdown("Brand <span style='color:red'>*</span>", unsafe_allow_html=True)
+#             brand = st.text_input(
+#                 "Enter Brand",
+#                 placeholder="Enter Brand",
+#                 label_visibility="collapsed",
+#                 key="add_brand",
+#             )
+#             if "brand" in errors:
+#                 st.error(errors["brand"])
+
+#         with r1c2:
+#             category = st.text_input(
+#                 "Category",
+#                 value="Laptop",
+#                 key="add_category",
+#             )
+
+#         with r1c3:
+#             st.markdown("Model <span style='color:red'>*</span>", unsafe_allow_html=True)
+#             model = st.text_input(
+#                 "Enter Model",
+#                 placeholder="Enter Model",
+#                 label_visibility="collapsed",
+#                 key="add_model",
+#             )
+#             if "model" in errors:
+#                 st.error(errors["model"])
+
+#         with r1c4:
+#             st.markdown("Serial No. <span style='color:red'>*</span>", unsafe_allow_html=True)
+#             serial_no = st.text_input(
+#                 "Enter Serial Number",
+#                 placeholder="Enter Serial Number",
+#                 label_visibility="collapsed",
+#                 key="add_serial",
+#             )
+#             if "serial" in errors:
+#                 st.error(errors["serial"])
+
+#         st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
+
+#         # ---------------- Row 2 ----------------
+#         r2c1, r2c2, r2c3, r2c4 = st.columns(4)
+
+#         with r2c1:
+#             qty = st.number_input("Quantity", min_value=1, value=1, key="add_qty")
+
+#         with r2c2:
+#             warranty = st.text_input("Warranty Status", key="add_warranty")
+
+#         with r2c3:
+#             status = st.text_input("Status", key="add_status")
+
+#         with r2c4:
+#             status_2 = st.text_input("Status-2", key="add_status2")
+
+#         st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
+
+#         # ---------------- Row 3 ----------------
+#         r3c1, r3c2 = st.columns(2)
+
+#         with r3c1:
+#             handover = st.text_input("Handover To", key="add_handover")
+
+#         with r3c2:
+#             received_from = st.text_input("Received From", key="add_received")
+
+#         st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
+
+#         # ---------------- Row 4 ----------------
+#         r4c1, r4c2 = st.columns(2)
+
+#         with r4c1:
+#             issue_type = st.radio(
+#                 "Issue Date",
+#                 ["Date", "NA"],
+#                 horizontal=True,
+#                 key="add_issue_type",
+#             )
+
+#             issue_date = (
+#                 st.date_input(
+#                     "Issue Date",
+#                     value=date.today(),
+#                     key="add_issue_date",
+#                     label_visibility="collapsed",
+#                 )
+#                 if issue_type == "Date"
+#                 else None
+#             )
+
+#         with r4c2:
+#             return_type = st.radio(
+#                 "Return Date",
+#                 ["Date", "NA"],
+#                 horizontal=True,
+#                 key="add_return_type",
+#             )
+
+#             return_date = (
+#                 st.date_input(
+#                     "Return Date",
+#                     value=date.today(),
+#                     key="add_return_date",
+#                     label_visibility="collapsed",
+#                 )
+#                 if return_type == "Date"
+#                 else None
+#             )
+
+#         st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
+
+#         # ---------------- Row 5 ----------------
+#         note = st.text_area("📝 Note", key="add_note", height=80)
+
+#         # ---------------- Buttons ----------------
+#         col1, col2 = st.columns(2)
+
+#         with col2:
+#             cancel = st.form_submit_button("❌ Cancel", use_container_width=True)
+
+#         with col1:
+#             submit = st.form_submit_button("➕ Add Item", use_container_width=True)
+
+#     # ---------------- CANCEL ----------------
+#     if cancel:
+#         st.session_state.add_errors = {}
+
+#         for k in list(st.session_state.keys()):
+#             if k.startswith("add_"):
+#                 del st.session_state[k]
+
+#         st.rerun()
+#         return
+
+#     # ---------------- SUBMIT ----------------
+#     if submit:
+
+#         data = {
+#             "brand": brand,
+#             "model": model,
+#             "serial": serial_no,
+#         }
+
+#         errors = validate_inventory(data)
+#         st.session_state.add_errors = errors
+
+#         if errors:
+#             st.warning("⚠️ Please fill all required fields before submitting.")
+#             return
+
+#         # ---------------- SUCCESS ----------------
+#         insert_inventory(
+#             (
+#                 brand,
+#                 model,
+#                 serial_no,
+#                 category,
+#                 warranty,
+#                 qty,
+#                 status,
+#                 handover,
+#                 issue_date,
+#                 received_from,
+#                 return_date,
+#                 note,
+#                 status_2,
+#             )
+#         )
+
+#         st.session_state.add_errors = {}
+
+#         for k in list(st.session_state.keys()):
+#             if k.startswith("add_"):
+#                 del st.session_state[k]
+
+#         st.success("✅ Added Successfully")
+#         st.rerun()
+
+
+# # Ensure session_state exists
+# if "add_errors" not in st.session_state:
+#     st.session_state.add_errors = {}
+
+
+# @st.dialog("📝 Add Inventory", width="large")
+# def add_inventory_dialog():
+
+#     errors = st.session_state.add_errors
+
+#     with st.form("add_form"):
+
+#         # ---------------- Row 1 ----------------
+#         r1c1, r1c2, r1c3, r1c4 = st.columns(4)
+
+#         with r1c1:
+#             st.write("Brand <span style='color:red'>*</span>", unsafe_allow_html=True)
+#             brand = st.text_input(
+#                 "Enter Brand",
+#                 placeholder="Enter Brand",
+#                 label_visibility="collapsed",
+#                 key="add_brand",
+#             )
+#             if "brand" in errors:
+#                 st.error(errors["brand"])
+
+#         with r1c2:
+#             category = st.text_input(
+#                 "Category",
+#                 value="Laptop",
+#                 key="add_category",
+#             )
+
+#         with r1c3:
+#             st.write("Model <span style='color:red'>*</span>", unsafe_allow_html=True)
+#             model = st.text_input(
+#                 "Enter Model",
+#                 placeholder="Enter Model",
+#                 label_visibility="collapsed",
+#                 key="add_model",
+#             )
+#             if "model" in errors:
+#                 st.error(errors["model"])
+
+#         with r1c4:
+#             st.write("Serial No. <span style='color:red'>*</span>", unsafe_allow_html=True)
+#             serial_no = st.text_input(
+#                 "Enter Serial Number",
+#                 placeholder="Enter Serial Number",
+#                 label_visibility="collapsed",
+#                 key="add_serial",
+#             )
+#             if "serial" in errors:
+#                 st.error(errors["serial"])
+
+#         st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
+
+#         # ---------------- Row 2 ----------------
+#         r2c1, r2c2, r2c3, r2c4 = st.columns(4)
+
+#         with r2c1:
+#             qty = st.number_input("Quantity", min_value=1, value=1, key="add_qty")
+
+#         with r2c2:
+#             warranty = st.text_input("Warranty Status", key="add_warranty")
+
+#         with r2c3:
+#             status = st.text_input("Status", key="add_status")
+
+#         with r2c4:
+#             status_2 = st.text_input("Status-2", key="add_status2")
+
+#         st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
+
+#         # ---------------- Row 3 ----------------
+#         r3c1, r3c2 = st.columns(2)
+
+#         with r3c1:
+#             handover = st.text_input("Handover To", key="add_handover")
+
+#         with r3c2:
+#             received_from = st.text_input("Received From", key="add_received")
+
+#         st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
+
+#         # ---------------- Row 4 ----------------
+#         r4c1, r4c2 = st.columns(2)
+
+#         with r4c1:
+#             issue_type = st.radio(
+#                 "Issue Date",
+#                 ["Date", "NA"],
+#                 horizontal=True,
+#                 key="add_issue_type",
+#             )
+
+#             issue_date = (
+#                 st.date_input(
+#                     "Issue Date",
+#                     value=date.today(),
+#                     key="add_issue_date",
+#                     label_visibility="collapsed",
+#                 )
+#                 if issue_type == "Date"
+#                 else None
+#             )
+
+#         with r4c2:
+#             return_type = st.radio(
+#                 "Return Date",
+#                 ["Date", "NA"],
+#                 horizontal=True,
+#                 key="add_return_type",
+#             )
+
+#             return_date = (
+#                 st.date_input(
+#                     "Return Date",
+#                     value=date.today(),
+#                     key="add_return_date",
+#                     label_visibility="collapsed",
+#                 )
+#                 if return_type == "Date"
+#                 else None
+#             )
+
+#         st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
+
+#         # ---------------- Row 5 ----------------
+#         note = st.text_area("📝 Note", key="add_note", height=80)
+
+#         # ---------------- Buttons ----------------
+#         col1, col2 = st.columns(2)
+
+#         with col2:
+#             cancel = st.form_submit_button("❌ Cancel", use_container_width=True)
+
+#         with col1:
+#             submit = st.form_submit_button("➕ Add Item", use_container_width=True)
+
+#     # ---------------- CANCEL ----------------
+#     if cancel:
+#         st.session_state.add_errors = {}
+
+#         # optional: clear form inputs
+#         for k in list(st.session_state.keys()):
+#             if k.startswith("add_"):
+#                 del st.session_state[k]
+
+#         st.rerun()
+
+#     # ---------------- VALIDATION ----------------
+#     if submit:
+
+#         errors = {}
+
+#         if not brand.strip():
+#             errors["brand"] = "Brand is required."
+
+#         if not model.strip():
+#             errors["model"] = "Model is required."
+
+#         if not serial_no.strip():
+#             errors["serial"] = "Serial Number is required."
+
+#         st.session_state.add_errors = errors
+
+#         # ❌ STOP if errors exist
+#         if errors:
+#             st.warning("⚠️ Please fill all required fields before submitting.")
+#             # return
+#             st.stop()  # stops execution and prevents insert_inventory from being called.
+
+#         # ---------------- SUCCESS ----------------
+#         insert_inventory(
+#             (
+#                 brand,
+#                 model,
+#                 serial_no,
+#                 category,
+#                 warranty,
+#                 qty,
+#                 status,
+#                 handover,
+#                 issue_date,
+#                 received_from,
+#                 return_date,
+#                 note,
+#                 status_2,
+#             )
+#         )
+
+#         st.session_state.add_errors = {}
+
+#         # optional cleanup
+#         for k in list(st.session_state.keys()):
+#             if k.startswith("add_"):
+#                 del st.session_state[k]
+
+#         st.success("✅ Added Successfully")
+#         st.rerun()
+
+# @st.dialog("📝 Add Inventory", width="large")
+# def add_inventory_dialog():
+
+#     errors = []
+
+#     brand_err = ""
+#     model_err = ""
+#     serial_err = ""
+
+#     with st.form("add_form"):
+
+#         # ---------------- Row 1 ----------------
+#         r1c1, r1c2, r1c3, r1c4 = st.columns(4)
+
+#         with r1c1:
+#             st.write("Brand <span style='color:red'>*</span>", unsafe_allow_html=True)
+#             brand = st.text_input(
+#                 "Enter Brand",
+#                 label_visibility="collapsed",
+#                 key="add_brand",
+#             )
+
+#             if brand_err:
+#                 st.error(brand_err)
+
+#         with r1c2:
+#             category = st.text_input(
+#                 "Category",
+#                 value="Laptop",
+#                 key="add_category",
+#             )
+
+#         with r1c3:
+#             st.write("Model <span style='color:red'>*</span>", unsafe_allow_html=True)
+#             model = st.text_input(
+#                 "Enter Model",
+#                 label_visibility="collapsed",
+#                 key="add_model",
+#             )
+
+#             if model_err:
+#                 st.error(model_err)
+
+#         with r1c4:
+#             st.write("Serial No. <span style='color:red'>*</span>", unsafe_allow_html=True)
+#             serial_no = st.text_input(
+#                 "Enter Serial Number",
+#                 label_visibility="collapsed",
+#                 key="add_serial",
+#             )
+
+#             if serial_err:
+#                 st.error(serial_err)
+
+#         st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
+
+#         # ---------------- Row 2 ----------------
+#         r2c1, r2c2, r2c3, r2c4 = st.columns(4)
+
+#         with r2c1:
+#             qty = st.number_input("Quantity", min_value=1, value=1, key="add_qty")
+
+#         with r2c2:
+#             warranty = st.text_input("Warranty Status", key="add_warranty")
+
+#         with r2c3:
+#             status = st.text_input("Status", key="add_status")
+
+#         with r2c4:
+#             status_2 = st.text_input("Status-2", key="add_status2")
+
+#         st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
+
+#         # ---------------- Row 3 ----------------
+#         r3c1, r3c2 = st.columns(2)
+
+#         with r3c1:
+#             handover = st.text_input("Handover To", key="add_handover")
+
+#         with r3c2:
+#             received_from = st.text_input("Received From", key="add_received")
+
+#         st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
+
+#         # ---------------- Row 4 ----------------
+#         r4c1, r4c2 = st.columns(2)
+
+#         with r4c1:
+#             issue_type = st.radio(
+#                 "Issue Date",
+#                 ["Date", "NA"],
+#                 horizontal=True,
+#                 key="add_issue_type",
+#             )
+
+#             issue_date = (
+#                 st.date_input(
+#                     "Issue Date",
+#                     value=date.today(),
+#                     key="add_issue_date",
+#                     label_visibility="collapsed",
+#                 )
+#                 if issue_type == "Date"
+#                 else None
+#             )
+
+#         with r4c2:
+#             return_type = st.radio(
+#                 "Return Date",
+#                 ["Date", "NA"],
+#                 horizontal=True,
+#                 key="add_return_type",
+#             )
+
+#             return_date = (
+#                 st.date_input(
+#                     "Return Date",
+#                     value=date.today(),
+#                     key="add_return_date",
+#                     label_visibility="collapsed",
+#                 )
+#                 if return_type == "Date"
+#                 else None
+#             )
+
+#         st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
+
+#         # ---------------- Row 5 ----------------
+#         note = st.text_area("📝 Note", key="add_note", height=80)
+
+#         # ---------------- Buttons ----------------
+#         col1, col2 = st.columns(2)
+
+#         with col2:
+#             cancel = st.form_submit_button("❌ Cancel", use_container_width=True)
+
+#         with col1:
+#             submit = st.form_submit_button("➕ Add Item", use_container_width=True)
+
+#     # ---------------- CANCEL ----------------
+#     if cancel:
+#         return
+
+#     # ---------------- VALIDATION ----------------
+#     if submit:
+
+#         # reset errors
+#         brand_err = ""
+#         model_err = ""
+#         serial_err = ""
+
+#         has_error = False
+
+#         if not brand.strip():
+#             brand_err = "Brand is required."
+#             has_error = True
+
+#         if not model.strip():
+#             model_err = "Model is required."
+#             has_error = True
+
+#         if not serial_no.strip():
+#             serial_err = "Serial Number is required."
+#             has_error = True
+
+#         # re-render form with errors (Streamlit reruns automatically)
+#         if has_error:
+#             st.rerun()
+
+#         # ---------------- SUCCESS ----------------
+#         insert_inventory(
+#             (
+#                 brand,
+#                 model,
+#                 serial_no,
+#                 category,
+#                 warranty,
+#                 qty,
+#                 status,
+#                 handover,
+#                 issue_date,
+#                 received_from,
+#                 return_date,
+#                 note,
+#                 status_2,
+#             )
+#         )
+
+#         st.success("✅ Added Successfully")
+#         st.rerun()
+
+
     # if submit:
     #     errors = []
 
     #     if not brand.strip():
-    #         errors.append("Brand is required")
-    #     if not model.strip():
-    #         errors.append("Model is required")
-    #     if not serial_no.strip():
-    #         errors.append("Serial Number is required")
+    #         errors.append("Brand is required.")
 
-    #     # ❌ NO validation_dialog() here anymore
+    #     if not model.strip():
+    #         errors.append("Model is required.")
+
+    #     if not serial_no.strip():
+    #         errors.append("Serial Number is required.")
 
     #     if errors:
-    #         for e in errors:
-    #             # st.write(f"- {e}")
-    #             st.toast(f"⚠️ {e}", icon="⚠️")
+    #         # Store errors in session state and rerun — the dialog
+    #         # will reopen and display them inline above the form.
+    #         st.session_state["add_form_errors"] = errors
+    #         st.rerun()
     #         return
-         
-    #         # st.toast("⚠️ Please fix the following errors:")
 
-    #     # if errors:
-    #     #     st.toast("❌ Please fix validation errors", icon="❌")
-    #     #     return
+    #     insert_inventory(
+    #         (
+    #             brand,
+    #             model,
+    #             serial_no,
+    #             category,
+    #             warranty,
+    #             qty,
+    #             status,
+    #             handover,
+    #             issue_date,
+    #             received_from,
+    #             return_date,
+    #             note,
+    #             status_2,
+    #         )
+    #     )
+
+    #     st.success("✅ Added Successfully")
+    #     st.rerun()
+
+
+# @st.dialog("📝 Add Inventory", width="large")
+# def add_inventory_dialog():
+
+#     # ---------------- Initialize Session State ----------------
+#     if "validation_errors" not in st.session_state:
+#         st.session_state.validation_errors = []
+
+#     # ---------------- Show Validation Errors ----------------
+#     if st.session_state.validation_errors:
+#         st.error("Please fix the following required fields:")
+
+#         for err in st.session_state.validation_errors:
+#             st.error(err)
+
+#         # Clear after displaying
+#         st.session_state.validation_errors = []
+
+#     with st.form("add_form"):
+
+#         # ---------------- Row 1 ----------------
+#         r1c1, r1c2, r1c3, r1c4 = st.columns(4)
+
+#         with r1c1:
+#             st.write("Brand <span style='color:red'>*</span>", unsafe_allow_html=True)
+#             brand = st.text_input(
+#                 "Enter Brand",
+#                 label_visibility="collapsed",
+#                 key="add_brand",
+#             )
+
+#         with r1c2:
+#             category = st.text_input(
+#                 "Category",
+#                 value="Laptop",
+#                 key="add_category",
+#             )
+
+#         with r1c3:
+#             st.write("Model <span style='color:red'>*</span>", unsafe_allow_html=True)
+#             model = st.text_input(
+#                 "Enter Model",
+#                 label_visibility="collapsed",
+#                 key="add_model",
+#             )
+
+#         with r1c4:
+#             st.write("Serial No. <span style='color:red'>*</span>", unsafe_allow_html=True)
+#             serial_no = st.text_input(
+#                 "Enter Serial Number",
+#                 label_visibility="collapsed",
+#                 key="add_serial",
+#             )
+
+#         st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
+
+#         # ---------------- Row 2 ----------------
+#         r2c1, r2c2, r2c3, r2c4 = st.columns(4)
+
+#         with r2c1:
+#             qty = st.number_input(
+#                 "Quantity",
+#                 min_value=1,
+#                 value=1,
+#                 key="add_qty",
+#             )
+
+#         with r2c2:
+#             warranty = st.text_input(
+#                 "Warranty Status",
+#                 key="add_warranty",
+#             )
+
+#         with r2c3:
+#             status = st.text_input(
+#                 "Status",
+#                 key="add_status",
+#             )
+
+#         with r2c4:
+#             status_2 = st.text_input(
+#                 "Status-2",
+#                 key="add_status2",
+#             )
+
+#         st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
+
+#         # ---------------- Row 3 ----------------
+#         r3c1, r3c2 = st.columns(2)
+
+#         with r3c1:
+#             handover = st.text_input(
+#                 "Handover To",
+#                 key="add_handover",
+#             )
+
+#         with r3c2:
+#             received_from = st.text_input(
+#                 "Received From",
+#                 key="add_received",
+#             )
+
+#         st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
+
+#         # ---------------- Row 4 ----------------
+#         r4c1, r4c2 = st.columns(2)
+
+#         with r4c1:
+#             issue_type = st.radio(
+#                 "Issue Date",
+#                 ["Date", "NA"],
+#                 horizontal=True,
+#                 key="add_issue_type",
+#             )
+
+#             issue_date = (
+#                 st.date_input(
+#                     "Issue Date",
+#                     value=date.today(),
+#                     key="add_issue_date",
+#                     label_visibility="collapsed",
+#                 )
+#                 if issue_type == "Date"
+#                 else None
+#             )
+
+#         with r4c2:
+#             return_type = st.radio(
+#                 "Return Date",
+#                 ["Date", "NA"],
+#                 horizontal=True,
+#                 key="add_return_type",
+#             )
+
+#             return_date = (
+#                 st.date_input(
+#                     "Return Date",
+#                     value=date.today(),
+#                     key="add_return_date",
+#                     label_visibility="collapsed",
+#                 )
+#                 if return_type == "Date"
+#                 else None
+#             )
+
+#         st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
+
+#         # ---------------- Row 5 ----------------
+#         note = st.text_area(
+#             "📝 Note",
+#             key="add_note",
+#             height=80,
+#         )
+
+#         # ---------------- Buttons ----------------
+#         col1, col2 = st.columns(2)
+
+#         with col2:
+#             cancel = st.form_submit_button(
+#                 "❌ Cancel",
+#                 use_container_width=True,
+#             )
+
+#         with col1:
+#             submit = st.form_submit_button(
+#                 "➕ Add Item",
+#                 use_container_width=True,
+#             )
+
+#     # ---------------- Cancel ----------------
+#     if cancel:
+#         st.session_state.validation_errors = []
+#         st.rerun()
+
+#     # ---------------- Submit ----------------
+#     if submit:
+#         errors = []
+
+#         if not brand.strip():
+#             errors.append("Brand is required.")
+
+#         if not model.strip():
+#             errors.append("Model is required.")
+
+#         if not serial_no.strip():
+#             errors.append("Serial Number is required.")
+
+#         if errors:
+#             st.session_state.validation_errors = errors
+#             st.rerun()
+
+#         insert_inventory(
+#             (
+#                 brand,
+#                 model,
+#                 serial_no,
+#                 category,
+#                 warranty,
+#                 qty,
+#                 status,
+#                 handover,
+#                 issue_date,
+#                 received_from,
+#                 return_date,
+#                 note,
+#                 status_2,
+#             )
+#         )
+
+#         st.session_state.validation_errors = []
+#         st.success("✅ Added Successfully")
+#         st.rerun()
+
+
+# @st.dialog("📝 Add Inventory", width="large")
+# def add_inventory_dialog():
+
+#     # ---------------- Show Validation Errors ----------------
+#     if st.session_state.validation_errors:
+#         st.error("Please fix the following required fields:")
+
+#         for err in st.session_state.validation_errors:
+#             st.error(err)
+
+#         st.session_state.validation_errors = []
+
+#     with st.form("add_form"):
+
+#         # ---------------- Row 1 ----------------
+#         r1c1, r1c2, r1c3, r1c4 = st.columns(4)
+
+#         with r1c1:
+#             st.write("Brand <span style='color:red'>*</span>", unsafe_allow_html=True)
+#             brand = st.text_input(
+#                 "Enter Brand",
+#                 label_visibility="collapsed",
+#                 key="add_brand",
+#             )
+
+#         with r1c2:
+#             category = st.text_input(
+#                 "Category",
+#                 value="Laptop",
+#                 key="add_category",
+#             )
+
+#         with r1c3:
+#             st.write("Model <span style='color:red'>*</span>", unsafe_allow_html=True)
+#             model = st.text_input(
+#                 "Enter Model",
+#                 label_visibility="collapsed",
+#                 key="add_model",
+#             )
+
+#         with r1c4:
+#             st.write("Serial No. <span style='color:red'>*</span>", unsafe_allow_html=True)
+#             serial_no = st.text_input(
+#                 "Enter Serial Number",
+#                 label_visibility="collapsed",
+#                 key="add_serial",
+#             )
+
+#         st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
+
+#         # ---------------- Row 2 ----------------
+#         r2c1, r2c2, r2c3, r2c4 = st.columns(4)
+
+#         with r2c1:
+#             qty = st.number_input(
+#                 "Quantity",
+#                 min_value=1,
+#                 value=1,
+#                 key="add_qty",
+#             )
+
+#         with r2c2:
+#             warranty = st.text_input(
+#                 "Warranty Status",
+#                 key="add_warranty",
+#             )
+
+#         with r2c3:
+#             status = st.text_input(
+#                 "Status",
+#                 key="add_status",
+#             )
+
+#         with r2c4:
+#             status_2 = st.text_input(
+#                 "Status-2",
+#                 key="add_status2",
+#             )
+
+#         st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
+
+#         # ---------------- Row 3 ----------------
+#         r3c1, r3c2 = st.columns(2)
+
+#         with r3c1:
+#             handover = st.text_input(
+#                 "Handover To",
+#                 key="add_handover",
+#             )
+
+#         with r3c2:
+#             received_from = st.text_input(
+#                 "Received From",
+#                 key="add_received",
+#             )
+
+#         st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
+
+#         # ---------------- Row 4 ----------------
+#         r4c1, r4c2 = st.columns(2)
+
+#         with r4c1:
+#             issue_type = st.radio(
+#                 "Issue Date",
+#                 ["Date", "NA"],
+#                 horizontal=True,
+#                 key="add_issue_type",
+#             )
+
+#             issue_date = (
+#                 st.date_input(
+#                     "Issue Date",
+#                     value=date.today(),
+#                     key="add_issue_date",
+#                     label_visibility="collapsed",
+#                 )
+#                 if issue_type == "Date"
+#                 else None
+#             )
+
+#         with r4c2:
+#             return_type = st.radio(
+#                 "Return Date",
+#                 ["Date", "NA"],
+#                 horizontal=True,
+#                 key="add_return_type",
+#             )
+
+#             return_date = (
+#                 st.date_input(
+#                     "Return Date",
+#                     value=date.today(),
+#                     key="add_return_date",
+#                     label_visibility="collapsed",
+#                 )
+#                 if return_type == "Date"
+#                 else None
+#             )
+
+#         st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
+
+#         # ---------------- Row 5 ----------------
+#         note = st.text_area(
+#             "📝 Note",
+#             key="add_note",
+#             height=80,
+#         )
+
+#         # ---------------- Buttons ----------------
+#         col1, col2 = st.columns(2)
+
+#         with col2:
+#             cancel = st.form_submit_button(
+#                 "❌ Cancel",
+#                 use_container_width=True,
+#             )
+
+#         with col1:
+#             submit = st.form_submit_button(
+#                 "➕ Add Item",
+#                 use_container_width=True,
+#             )
+
+#     # ---------------- Cancel ----------------
+#     if cancel:
+#         st.session_state.validation_errors = []
+#         st.rerun()
+
+#     # ---------------- Submit ----------------
+#     if submit:
+#         errors = []
+
+#         if not brand.strip():
+#             errors.append("Brand is required.")
+
+#         if not model.strip():
+#             errors.append("Model is required.")
+
+#         if not serial_no.strip():
+#             errors.append("Serial Number is required.")
+
+#         if errors:
+#             st.session_state.validation_errors = errors
+#             st.rerun()
+
+#         insert_inventory(
+#             (
+#                 brand,
+#                 model,
+#                 serial_no,
+#                 category,
+#                 warranty,
+#                 qty,
+#                 status,
+#                 handover,
+#                 issue_date,
+#                 received_from,
+#                 return_date,
+#                 note,
+#                 status_2,
+#             )
+#         )
+
+#         st.session_state.validation_errors = []
+#         st.success("✅ Added Successfully")
+#         st.rerun()
+
+# @st.dialog("📝 Add Inventory", width="large")
+# def add_inventory_dialog():
+#     with st.form("add_form"):
+
+#         # — Row 1: Brand | Category | Model | Serial No —
+#         r1c1, r1c2, r1c3, r1c4 = st.columns(4)
+
+#         with r1c1:
+#             st.write("Brand <span style='color:red'>*</span>", unsafe_allow_html=True)
+#             brand = st.text_input("Enter Brand", label_visibility="collapsed", key="add_brand")
+
+#         with r1c2:
+#             category = st.text_input("Category", value="Laptop", key="add_category")
+
+#         with r1c3:
+#             st.write("Model <span style='color:red'>*</span>", unsafe_allow_html=True)
+#             model = st.text_input("Enter Model", label_visibility="collapsed", key="add_model")
+
+#         with r1c4:
+#             st.write("Serial No. <span style='color:red'>*</span>", unsafe_allow_html=True)
+#             serial_no = st.text_input("Enter Serial Number", label_visibility="collapsed", key="add_serial")
+
+#         st.markdown("<hr style='margin: 6px 0;'>", unsafe_allow_html=True)
+
+#         # — Row 2: Quantity | Warranty | Status | Status-2 —
+#         r2c1, r2c2, r2c3, r2c4 = st.columns(4)
+
+#         with r2c1:
+#             qty = st.number_input("Quantity", value=1, min_value=1, key="add_qty")
+
+#         with r2c2:
+#             warranty = st.text_input("Warranty Status", key="add_warranty")
+
+#         with r2c3:
+#             status = st.text_input("Status", key="add_status")
+
+#         with r2c4:
+#             status_2 = st.text_input("Status-2", key="add_status2")
+
+#         st.markdown("<hr style='margin: 6px 0;'>", unsafe_allow_html=True)
+
+#         # — Row 3: Handover To | Received From —
+#         r3c1, r3c2 = st.columns(2)
+
+#         with r3c1:
+#             handover = st.text_input("Handover To", key="add_handover")
+
+#         with r3c2:
+#             received_from = st.text_input("Received From", key="add_received")
+
+#         st.markdown("<hr style='margin: 6px 0;'>", unsafe_allow_html=True)
+
+#         # — Row 4: Issue Date | Return Date —
+#         r4c1, r4c2 = st.columns(2)
+
+#         with r4c1:
+#             issue_type = st.radio(
+#                 "Issue Date",
+#                 ["Date", "NA"],
+#                 horizontal=True,
+#                 key="add_issue_type"
+#             )
+#             issue_date = (
+#                 st.date_input("Issue Date", value=date.today(), key="add_issue_date",
+#                               label_visibility="collapsed")
+#                 if issue_type == "Date" else None
+#             )
+
+#             # cancel = st.button("❌ Cancel", use_container_width=True, key="add_cancel")
+
+#         with r4c2:
+#             return_type = st.radio(
+#                 "Return Date",
+#                 ["Date", "NA"],
+#                 horizontal=True,
+#                 key="add_return_type"
+#             )
+#             return_date = (
+#                 st.date_input("Return Date", value=date.today(), key="add_return_date",
+#                               label_visibility="collapsed")
+#                 if return_type == "Date" else None
+#             )
+
+#         st.markdown("<hr style='margin: 6px 0;'>", unsafe_allow_html=True)
+
+#         # — Row 5: Note (full width) —
+#         note = st.text_area("📝 Note", key="add_note", height=80)
+
+#         st.markdown("<hr>", unsafe_allow_html=True)
+
+#         note = st.text_area("📝 Note", key="add_note", height=80)
+
+#         col1, col2 = st.columns(2)
+
+#         with col1:
+#             cancel = st.form_submit_button(
+#                 "❌ Cancel",
+#                 use_container_width=True
+#             )
+
+#         with col2:
+#             submit = st.form_submit_button(
+#                 "➕ Add Item",
+#                 use_container_width=True
+#             )
+
+#         if cancel:
+#             st.rerun()
+
+#         if submit:
+#             errors = []
+
+#             if not brand.strip():
+#                 errors.append("Brand is required.")
+#             if not model.strip():
+#                 errors.append("Model is required.")
+#             if not serial_no.strip():
+#                 errors.append("Serial Number is required.")
+
+#             if errors:
+#                 validation_dialog(errors)
+#                 return
+
+#             insert_inventory((
+#                 brand,
+#                 model,
+#                 serial_no,
+#                 category,
+#                 warranty,
+#                 qty,
+#                 status,
+#                 handover,
+#                 issue_date,
+#                 received_from,
+#                 return_date,
+#                 note,
+#                 status_2,
+#             ))
+
+#     st.success("✅ Added Successfully")
+#     st.rerun()
+
+#         # submit = st.form_submit_button("➕ Add Item", use_container_width=True)
+
+#         # if submit:
+#         #     errors = []
+#         #     if not brand.strip():
+#         #         errors.append("Please enter Brand.")
+#         #     if not model.strip():
+#         #         errors.append("Please enter Model.")
+#         #     if not serial_no.strip():
+#         #         errors.append("Please enter Serial Number.")
+
+#         #     if errors:
+#         #         for e in errors:
+#         #             st.error(e)
+#         #         return
+
+#         #     insert_inventory((
+#         #         brand, model, serial_no, category,
+#         #         warranty, qty, status,
+#         #         handover, issue_date,
+#         #         received_from, return_date,
+#         #         note, status_2
+#         #     ))
+#         #     st.success("✅ Added Successfully")
+#         #     st.rerun()
+
+    
+
+#     # # 👇 validation + logic outside form
+#     # if submit:
+#     #     errors = []
+
+#     #     if not brand.strip():
+#     #         errors.append("Brand is required")
+#     #     if not model.strip():
+#     #         errors.append("Model is required")
+#     #     if not serial_no.strip():
+#     #         errors.append("Serial Number is required")
+
+#     #     # ❌ NO validation_dialog() here anymore
+
+#     #     if errors:
+#     #         for e in errors:
+#     #             # st.write(f"- {e}")
+#     #             st.toast(f"⚠️ {e}", icon="⚠️")
+#     #         return
+         
+#     #         # st.toast("⚠️ Please fix the following errors:")
+
+#     #     # if errors:
+#     #     #     st.toast("❌ Please fix validation errors", icon="❌")
+#     #     #     return
         
 
-@st.dialog("⚠️ Validation Error")
-def validation_dialog(errors):
-    st.markdown("### Please fill the following required fields:")
+# @st.dialog("⚠️ Validation Error")
+# def validation_dialog(errors):
+#     st.markdown("### Please fill the following required fields:")
 
-    for err in errors:
-        st.error(err)
+#     for err in errors:
+#         st.error(err)
 
-    if st.button("OK", use_container_width=True):
-        st.rerun()
+#     if st.button("OK", use_container_width=True):
+#         st.rerun()
+
 # ==========================
 # EDIT INVENTORY
 # ==========================
