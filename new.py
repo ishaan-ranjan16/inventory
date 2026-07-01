@@ -489,7 +489,7 @@ def add_inventory_dialog():
         st.session_state.add_errors = errors
 
         if errors:
-            st.rerun()
+            st.stop()
             return
         # ── Resolve dates from the CURRENT radio choice ──────────────
         # IMPORTANT: only read the date key when the radio says "Date".
@@ -501,20 +501,36 @@ def add_inventory_dialog():
         issue_date  = st.session_state.get("add_issue_date",  None) if issue_type  == "Date" else None
         return_date = st.session_state.get("add_return_date", None) if return_type == "Date" else None
 
+        # insert_inventory((
+        #     st.session_state.get("add_brand",""),
+        #     st.session_state.get("add_model",""),
+        #     st.session_state.get("add_serial",""),
+        #     st.session_state.get("add_category",""),
+        #     st.session_state.get("add_warranty",""),
+        #     st.session_state.get("add_qty",1),
+        #     st.session_state.get("add_status",""),
+        #     st.session_state.get("add_status2",""),
+        #     st.session_state.get("add_handover",""),
+        #     st.session_state.get("add_received",""),
+        #     issue_date,    # ← resolved, never a stale string
+        #     return_date,   # ← resolved, never a stale string
+        #     st.session_state.get("add_note",""),
+        # ))
+
         insert_inventory((
-            st.session_state.get("add_brand",    ""),
-            st.session_state.get("add_model",    ""),
-            st.session_state.get("add_serial",   ""),
+            st.session_state.get("add_brand", ""),
+            st.session_state.get("add_model", ""),
+            st.session_state.get("add_serial", ""),
             st.session_state.get("add_category", ""),
             st.session_state.get("add_warranty", ""),
-            st.session_state.get("add_qty",      1),
-            st.session_state.get("add_status",   ""),
-            st.session_state.get("add_status2",  ""),
+            st.session_state.get("add_qty", 1),
+            st.session_state.get("add_status", ""),
             st.session_state.get("add_handover", ""),
+            issue_date,
             st.session_state.get("add_received", ""),
-            issue_date,    # ← resolved, never a stale string
-            return_date,   # ← resolved, never a stale string
-            st.session_state.get("add_note",     ""),
+            return_date,
+            st.session_state.get("add_note", ""),
+            st.session_state.get("add_status2", ""),
         ))
 
         st.session_state.add_errors = {}
