@@ -107,6 +107,9 @@ if "delete_id" not in st.session_state:
 if "delete_label" not in st.session_state:
     st.session_state.delete_label = ""
 
+if "show_add_dialog" not in st.session_state:
+    st.session_state.show_add_dialog = False
+
 def safe_date(val):
     if val is None or (isinstance(val, str) and val.strip() == ""):
         return date.today()

@@ -106,8 +106,10 @@ if "delete_label" not in st.session_state:
 if "add_errors" not in st.session_state:
     st.session_state.add_errors = {}
 
-# SAFE DATE HELPERS
-# ==========================
+if "show_add_dialog" not in st.session_state:
+    st.session_state.show_add_dialog = False
+
+# ==================
 def safe_date(val):
     """For pre-filling date_input widgets — always returns a date object."""
     if val is None or (isinstance(val, str) and val.strip() == ""):
@@ -156,7 +158,6 @@ def fetch_inventory():
     try:
         conn = get_connection()
         cur = conn.cursor()
-
         cur.execute("""
             SELECT id, brand, model, serial_no, item_category, quantity,
                    warranty_status, status, hand_over_to, issue_date,
@@ -165,7 +166,6 @@ def fetch_inventory():
             ORDER BY id DESC
         """)
         rows = cur.fetchall()
-
         cur.close()
         conn.close()
 
@@ -249,7 +249,7 @@ def delete_inventory(id):
     conn.close()
 
 # EXCEL EXPORT
-# ==========================
+# =================
 def generate_inventory_excel(data: pd.DataFrame) -> bytes:
     buffer = io.BytesIO()
 
@@ -288,7 +288,7 @@ def generate_inventory_excel(data: pd.DataFrame) -> bytes:
     buffer.seek(0)
     return buffer.getvalue()
 # PDF EXPORT
-# ==========================
+# ==================
 def generate_inventory_pdf(data: pd.DataFrame) -> bytes:
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(
@@ -299,7 +299,6 @@ def generate_inventory_pdf(data: pd.DataFrame) -> bytes:
     )
     styles = getSampleStyleSheet()
     elements = []
-
     elements.append(Paragraph("Inventory Report", styles["Title"]))
     elements.append(Paragraph(f"Generated on {datetime.now().strftime('%d-%m-%Y %I:%M:%S %p')}", styles["Normal"]))
     elements.append(Spacer(1, 10))
@@ -354,7 +353,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # VALIDATION
-# ==========================
+# ==================
 def validate_inventory(data):
     errors = {}
     if not (data["brand"] or "").strip():
@@ -366,7 +365,7 @@ def validate_inventory(data):
     return errors
 
 # ADD INVENTORY DIALOG
-# ==========================
+# ===================
 @st.dialog("📝 Add Inventory", width="large")
 def add_inventory_dialog():
     errors = st.session_state.add_errors or {}
@@ -374,13 +373,11 @@ def add_inventory_dialog():
     if errors:
         st.markdown(
             ":orange-badge[⚠️ Please enter the highlighted fields below.]"
-            )
-        # st.warning("⚠️ Please enter the highlighted fields below.",icon="⚠️", color="yellow")
+            ) # st.warning("⚠️ Please enter the highlighted fields below.",icon="⚠️", color="yellow")
 
     with st.form("add_form"):
         # — Row 1: Brand | Category | Model | Serial No —
         r1c1, r1c2, r1c3, r1c4 = st.columns(4)
-
         with r1c1:
             st.markdown("Brand <span style='color:red'>*</span>", unsafe_allow_html=True)
             st.text_input("Enter Brand", label_visibility="collapsed", key="add_brand")
@@ -390,10 +387,8 @@ def add_inventory_dialog():
                     unsafe_allow_html=True
                     )
                 # st.error(errors["brand"])
-
         with r1c2:
             st.text_input("Category", value="Laptop", key="add_category")
-
         with r1c3:
             st.markdown("Model <span style='color:red'>*</span>", unsafe_allow_html=True)
             st.text_input("Enter Model", label_visibility="collapsed", key="add_model")
@@ -405,7 +400,6 @@ def add_inventory_dialog():
                 # st.caption(errors["model"])
                 # st.markdown("<span style=color:red; font-size:12px;>" + errors["model"] + "</span>", unsafe_allow_html=True)
                 # st.info(errors["model"])
-
         with r1c4:
             st.markdown("Serial No. <span style='color:red'>*</span>", unsafe_allow_html=True)
             st.text_input("Enter Serial Number", label_visibility="collapsed", key="add_serial")
@@ -441,7 +435,6 @@ def add_inventory_dialog():
         st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
         # — Row 4: Issue Date | Return Date —
         r4c1, r4c2 = st.columns(2)
-
         with r4c1:
             issue_type = st.radio(
                 "📅 Issue Date", ["Date", "NA"],
@@ -468,39 +461,43 @@ def add_inventory_dialog():
         col1, col2 = st.columns(2)
         submit = col1.form_submit_button("💾 Save", use_container_width=True)
         cancel = col2.form_submit_button("❌ Cancel",   use_container_width=True)
-
-    # — Cancel —
+    # if cancel:
+    #     st.session_state.add_errors = {}
+    #     for k in list(st.session_state.keys()):
+    #         if k.startswith("add_"):
+    #             del st.session_state[k]
+    #     st.rerun()
     if cancel:
         st.session_state.add_errors = {}
+        st.session_state.show_add_dialog = False
+        
         for k in list(st.session_state.keys()):
             if k.startswith("add_"):
                 del st.session_state[k]
         st.rerun()
 
-    # — Submit —
     if submit:
         data = {
             "brand":  st.session_state.get("add_brand",  ""),
             "model":  st.session_state.get("add_model",  ""),
             "serial": st.session_state.get("add_serial", ""),
         }
-
+        # errors = validate_inventory(data)
+        # st.session_state.add_errors = errors
+        # if errors:
+        #     st.stop()
+        #     return
         errors = validate_inventory(data)
         st.session_state.add_errors = errors
-
+    
         if errors:
-            st.stop()
-            return
-        # ── Resolve dates from the CURRENT radio choice ──────────────
-        # IMPORTANT: only read the date key when the radio says "Date".
-        # If the radio is "NA", we pass None regardless of what stale
-        # value session_state might hold for add_issue_date / add_return_date.
+            st.rerun()
+
         issue_type  = st.session_state.get("add_issue_type",  "NA")
         return_type = st.session_state.get("add_return_type", "NA")
 
         issue_date  = st.session_state.get("add_issue_date",  None) if issue_type  == "Date" else None
         return_date = st.session_state.get("add_return_date", None) if return_type == "Date" else None
-
         # insert_inventory((
         #     st.session_state.get("add_brand",""),
         #     st.session_state.get("add_model",""),
@@ -516,7 +513,6 @@ def add_inventory_dialog():
         #     return_date,   # ← resolved, never a stale string
         #     st.session_state.get("add_note",""),
         # ))
-
         insert_inventory((
             st.session_state.get("add_brand", ""),
             st.session_state.get("add_model", ""),
@@ -532,12 +528,21 @@ def add_inventory_dialog():
             st.session_state.get("add_note", ""),
             st.session_state.get("add_status2", ""),
         ))
+        # st.session_state.add_errors = {}
+        # for k in list(st.session_state.keys()):
+        #     if k.startswith("add_"):
+        #         del st.session_state[k]
 
+        # st.success("#### ✅ Saved Successfully!")
+        # time.sleep(0.5)
+        # st.rerun()
         st.session_state.add_errors = {}
+        st.session_state.show_add_dialog = False
+        
         for k in list(st.session_state.keys()):
             if k.startswith("add_"):
                 del st.session_state[k]
-
+                
         st.success("#### ✅ Saved Successfully!")
         time.sleep(0.5)
         st.rerun()
@@ -549,10 +554,8 @@ def edit_inventory_dialog():
     row = st.session_state.edit_row
 
     with st.form("edit_form"):
-
         # — Row 1: Brand | Category | Model | Serial No —
         r1c1, r1c2, r1c3, r1c4 = st.columns(4)
-
         with r1c1:
             brand = st.text_input("Brand", value=row["brand"])
         with r1c2:
@@ -561,12 +564,10 @@ def edit_inventory_dialog():
             model = st.text_input("Model", value=row["model"])
         with r1c4:
             serial = st.text_input("Serial No.", value=row["serial_no"])
-
         st.markdown("<hr style='margin: 6px 0;'>", unsafe_allow_html=True)
 
         # — Row 2: Qty | Warranty | Status | Status-2 —
         r2c1, r2c2, r2c3, r2c4 = st.columns(4)
-
         with r2c1:
             qty = st.number_input(
                 "Quantity",
@@ -579,12 +580,10 @@ def edit_inventory_dialog():
             status = st.text_input("Status", value=row["status"] or "")
         with r2c4:
             status_2 = st.text_input("Status-2", value=row.get("status_2") or "")
-
         st.markdown("<hr style='margin: 6px 0;'>", unsafe_allow_html=True)
 
         # — Row 3: Handover To | Received From —
         r3c1, r3c2 = st.columns(2)
-
         with r3c1:
             handover = st.text_input("Handover To", value=row.get("hand_over_to") or "")
         with r3c2:
@@ -594,7 +593,6 @@ def edit_inventory_dialog():
 
         # — Row 4: Issue Date | Return Date —
         r4c1, r4c2 = st.columns(2)
-
         with r4c1:
             issue_type = st.radio(
                 "Issue Date", ["Date", "NA"],
@@ -626,10 +624,8 @@ def edit_inventory_dialog():
             return_final = return_date if return_type == "Date" else None
 
         st.markdown("<hr style='margin: 6px 0;'>", unsafe_allow_html=True)
-
         # — Row 5: Note —
         note = st.text_area("📝 Note", value=row.get("note") or "", height=80)
-
         c1, c2 = st.columns(2)
         save   = c1.form_submit_button("💾 Save",    use_container_width=True)
         cancel = c2.form_submit_button("❌ Cancel", use_container_width=True)
@@ -650,13 +646,12 @@ def edit_inventory_dialog():
     if cancel:
         st.rerun()
 
-# CONFIRM DELETE DIALOG
-# ==========================
+# CONFIRM DELETE DIALOG-
+# =====================
 @st.dialog("🗑️ Confirm Delete")
 def confirm_delete_dialog():
     item_id    = st.session_state.delete_id
     item_label = st.session_state.delete_label
-
     st.warning("Are you sure you want to delete this item?")
     st.markdown(
         f'<p style="font-size:13px; margin: 4px 0 12px 0;">'
@@ -666,7 +661,6 @@ def confirm_delete_dialog():
     st.caption("This action cannot be undone.")
 
     c1, c2 = st.columns(2)
-
     with c1:
         if st.button("🗑️ Yes, Delete", type="primary", use_container_width=True):
             delete_inventory(item_id)
@@ -701,9 +695,23 @@ title_col, add_col, pdf_col, excel_col = st.columns(
 with title_col:
     st.badge("**:material/inventory: Overall Inventory Status**", color='green')
 
+# with add_col:
+#     if st.button("Add Inventory", icon=":material/add_box:", key="add_inv_btn", use_container_width=True):
+#         add_inventory_dialog()
+
 with add_col:
-    if st.button("Add Inventory", icon=":material/add_box:", key="add_inv_btn", use_container_width=True):
-        add_inventory_dialog()
+    if st.button(
+        "Add Inventory",
+        icon=":material/add_box:",
+        key="add_inv_btn",
+        use_container_width=True,
+    ):
+        st.session_state.show_add_dialog = True
+
+# if st.session_state.show_add_dialog:
+#     add_inventory_dialog()
+if st.session_state.get("show_add_dialog", False):
+    add_inventory_dialog()
 
 with pdf_col:
     pdf_bytes = generate_inventory_pdf(df)
@@ -728,7 +736,7 @@ with excel_col:
     )
 
 # METRICS
-# ==========================
+# ================
 total     = len(df)
 Issued    = len(df[df["status"].str.lower().isin(["issued", "given"])])
 Available = len(df[df["status"].str.lower().isin(["in-inventory", "inventory"])])
@@ -846,4 +854,3 @@ for _, row in list_df.iterrows():
 
 st.divider()
 st.caption("Inventory Management System • Dashboard")
-# st.caption("Developed by: [Your Name] | Contact: [Your Email] | © 2024 All Rights Reserved.")
