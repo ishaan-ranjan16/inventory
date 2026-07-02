@@ -1,0 +1,246 @@
+import streamlit as st
+import pandas as pd
+from datetime import date, datetime
+import io
+import time
+
+from db_connection import get_connection
+from reportlab.lib.pagesizes import landscape, A4
+from reportlab.lib import colors
+from reportlab.lib.units import mm
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet
+
+st.set_page_config(page_title="Inventory", layout="wide")
+
+# ==========================
+# GLOBAL CSS
+# ==========================
+st.markdown("""
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+
+<style>
+html { zoom: 72%; }
+
+div[data-testid="stDialog"] > div {
+    width: 95vw !important;
+    max-width: 1700px !important;
+}
+
+div[data-testid="stDialog"] *::-webkit-scrollbar { width: 10px; }
+div[data-testid="stDialog"] *::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+div[data-testid="stDialog"] *::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #4CAF50, #2196F3); border-radius: 10px; }
+
+</style>
+""", unsafe_allow_html=True)
+
+# ==========================
+# SESSION STATE INIT
+# ==========================
+if "show_add_dialog" not in st.session_state:
+    st.session_state.show_add_dialog = False
+
+if "add_errors" not in st.session_state:
+    st.session_state.add_errors = {}
+
+# ==========================
+# HELPERS
+# ==========================
+def clear_add_form_state():
+    for k in list(st.session_state.keys()):
+        if k.startswith("add_"):
+            del st.session_state[k]
+    st.session_state.add_errors = {}
+
+def validate_inventory(data):
+    errors = {}
+    if not (data.get("brand") or "").strip():
+        errors["brand"] = "Brand is required."
+    if not (data.get("model") or "").strip():
+        errors["model"] = "Model is required."
+    if not (data.get("serial") or "").strip():
+        errors["serial"] = "Serial No. is required."
+    return errors
+
+def safe_date_str(val):
+    if isinstance(val, datetime):
+        return val.date()
+    if isinstance(val, date):
+        return val
+    return date.today()
+
+# ==========================
+# DATABASE FUNCTIONS
+# ==========================
+def insert_inventory(data):
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        INSERT INTO inventory (
+            brand, model, serial_no, item_category,
+            warranty_status, quantity, status,
+            hand_over_to, issue_date, received_from,
+            return_date, note, status_2
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, data)
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+def fetch_inventory():
+    conn = get_connection()
+    df = pd.read_sql("SELECT * FROM inventory ORDER BY id DESC", conn)
+    conn.close()
+    return df
+
+@st.dialog("📝 Add Inventory", width="large")
+def add_inventory_dialog():
+
+    errors = st.session_state.add_errors
+
+    if errors:
+        st.warning("Please fix highlighted fields")
+
+    with st.form("add_form"):
+
+        c1, c2, c3, c4 = st.columns(4)
+
+        with c1:
+            st.text_input("Brand *", key="add_brand")
+            if "brand" in errors:
+                st.error(errors["brand"])
+
+        with c2:
+            st.text_input("Category", key="add_category", value="Laptop")
+
+        with c3:
+            st.text_input("Model *", key="add_model")
+            if "model" in errors:
+                st.error(errors["model"])
+
+        with c4:
+            st.text_input("Serial No *", key="add_serial")
+            if "serial" in errors:
+                st.error(errors["serial"])
+
+        st.divider()
+
+        c1, c2, c3, c4 = st.columns(4)
+
+        with c1:
+            st.number_input("Qty", min_value=1, value=1, key="add_qty")
+        with c2:
+            st.text_input("Warranty", key="add_warranty")
+        with c3:
+            st.text_input("Status", key="add_status")
+        with c4:
+            st.text_input("Status-2", key="add_status2")
+
+        st.divider()
+
+        c1, c2 = st.columns(2)
+
+        with c1:
+            st.text_input("Handover To", key="add_handover")
+        with c2:
+            st.text_input("Received From", key="add_received")
+
+        st.divider()
+
+        c1, c2 = st.columns(2)
+
+        with c1:
+            issue_type = st.radio("Issue Date", ["Date", "NA"], horizontal=True, key="add_issue_type")
+            if issue_type == "Date":
+                st.date_input("Issue Date", key="add_issue_date")
+
+        with c2:
+            return_type = st.radio("Return Date", ["Date", "NA"], horizontal=True, key="add_return_type")
+            if return_type == "Date":
+                st.date_input("Return Date", key="add_return_date")
+
+        st.divider()
+
+        st.text_area("Note", key="add_note")
+
+        c1, c2 = st.columns(2)
+
+        save = c1.form_submit_button("💾 Save", use_container_width=True)
+        cancel = c2.form_submit_button("❌ Cancel", use_container_width=True)
+
+    # ================= CANCEL =================
+    if cancel:
+        clear_add_form_state()
+        st.session_state.show_add_dialog = False
+        st.rerun()
+
+    # ================= SAVE =================
+    if save:
+
+        data = {
+            "brand": st.session_state.get("add_brand"),
+            "model": st.session_state.get("add_model"),
+            "serial": st.session_state.get("add_serial"),
+        }
+
+        errors = validate_inventory(data)
+
+        if errors:
+            st.session_state.add_errors = errors
+            st.rerun()
+
+        issue_type = st.session_state.get("add_issue_type")
+        return_type = st.session_state.get("add_return_type")
+
+        issue_date = st.session_state.get("add_issue_date") if issue_type == "Date" else None
+        return_date = st.session_state.get("add_return_date") if return_type == "Date" else None
+
+        insert_inventory((
+            st.session_state.get("add_brand", ""),
+            st.session_state.get("add_model", ""),
+            st.session_state.get("add_serial", ""),
+            st.session_state.get("add_category", ""),
+            st.session_state.get("add_warranty", ""),
+            st.session_state.get("add_qty", 1),
+            st.session_state.get("add_status", ""),
+            st.session_state.get("add_handover", ""),
+            issue_date,
+            st.session_state.get("add_received", ""),
+            return_date,
+            st.session_state.get("add_note", ""),
+            st.session_state.get("add_status2", ""),
+        ))
+
+        clear_add_form_state()
+        st.session_state.show_add_dialog = False
+
+        st.success("Saved Successfully")
+        st.rerun()
+
+# ==========================
+# LOAD DATA
+# ==========================
+df = fetch_inventory()
+
+# ==========================
+# TOP BUTTON
+# ==========================
+col1, col2 = st.columns([8, 2])
+
+with col1:
+    st.title("Inventory Dashboard")
+
+with col2:
+    if st.button("➕ Add Inventory", use_container_width=True):
+        st.session_state.show_add_dialog = True
+
+if st.session_state.show_add_dialog:
+    add_inventory_dialog()
+
+# ==========================
+# TABLE
+# ==========================
+st.dataframe(df, use_container_width=True)
