@@ -16,7 +16,7 @@ st.set_page_config(page_title="Inventory", layout="wide")
 st.markdown("""
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <style>
-        html { zoom: 68%; }
+        html { zoom: 69%; }
 
         .block-container {
             padding-top: 0rem;
@@ -96,21 +96,23 @@ st.markdown("""
             background-color: #1f77b4 !important;
             color: white !important;
         }
-    </style>
+
+</style>
+
 """, unsafe_allow_html=True)
 
-# SESSION STATE
-# =============
-if "edit_row"         not in st.session_state: st.session_state.edit_row         = None
-if "delete_id"        not in st.session_state: st.session_state.delete_id        = None
-if "delete_label"     not in st.session_state: st.session_state.delete_label     = ""
-if "add_errors"       not in st.session_state: st.session_state.add_errors       = {}
-if "show_add_dialog"  not in st.session_state: st.session_state.show_add_dialog  = False
-if "show_delete_dialog" not in st.session_state:
-    st.session_state.show_delete_dialog = False
+# ═══════════════════════════════════════════════════════════════════
+# SESSION STATE  —  single active_dialog gate
+# ═══════════════════════════════════════════════════════════════════
+if "active_dialog"  not in st.session_state: st.session_state.active_dialog  = None   # "add" | "edit" | "delete" | None
+if "edit_row_data"  not in st.session_state: st.session_state.edit_row_data  = None   # dict of the row being edited
+if "delete_id"      not in st.session_state: st.session_state.delete_id      = None
+if "delete_label"   not in st.session_state: st.session_state.delete_label   = ""
+if "add_errors"     not in st.session_state: st.session_state.add_errors     = {}
 
+# ═══════════════════════════════════════════════════════════════════
 # AUTOCOMPLETE — FETCH DISTINCT VALUES FROM DB
-# =============
+# ═══════════════════════════════════════════════════════════════════
 @st.cache_data(ttl=300)
 def fetch_distinct(column):
     try:
@@ -127,8 +129,9 @@ def fetch_distinct(column):
     except Exception:
         return []
 
+# ═══════════════════════════════════════════════════════════════════
 # DATE HELPERS
-# ============
+# ═══════════════════════════════════════════════════════════════════
 def safe_date(val):
     if val is None or (isinstance(val, str) and val.strip() == ""):
         return date.today()
@@ -159,8 +162,9 @@ def _safe_date_str(val):
             return None
     return None
 
+# ═══════════════════════════════════════════════════════════════════
 # DATABASE FUNCTIONS
-# ==================
+# ═══════════════════════════════════════════════════════════════════
 def fetch_inventory():
     columns = [
         "id", "brand", "model", "serial_no", "item_category", "quantity",
@@ -231,8 +235,9 @@ def delete_inventory(row_id):
     cur.close()
     conn.close()
 
+# ═══════════════════════════════════════════════════════════════════
 # EXCEL EXPORT
-# ============
+# ═══════════════════════════════════════════════════════════════════
 def generate_inventory_excel(data: pd.DataFrame) -> bytes:
     buffer    = io.BytesIO()
     export_df = data.reset_index(drop=True).copy()
@@ -263,8 +268,9 @@ def generate_inventory_excel(data: pd.DataFrame) -> bytes:
     buffer.seek(0)
     return buffer.getvalue()
 
+# ═══════════════════════════════════════════════════════════════════
 # PDF EXPORT
-# ==========
+# ═══════════════════════════════════════════════════════════════════
 def generate_inventory_pdf(data: pd.DataFrame) -> bytes:
     buffer = io.BytesIO()
     doc    = SimpleDocTemplate(
@@ -317,8 +323,9 @@ def generate_inventory_pdf(data: pd.DataFrame) -> bytes:
     buffer.seek(0)
     return buffer.getvalue()
 
+# ═══════════════════════════════════════════════════════════════════
 # DIALOG — SCROLLBAR STYLE
-# ========================
+# ═══════════════════════════════════════════════════════════════════
 st.markdown("""
     <style>
     div[data-testid="stDialog"] *::-webkit-scrollbar       { width: 10px; }
@@ -329,8 +336,9 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# ═══════════════════════════════════════════════════════════════════
 # VALIDATION
-# ==========
+# ═══════════════════════════════════════════════════════════════════
 def validate_inventory(data):
     errors = {}
     if not (data.get("brand") or "").strip():
@@ -341,8 +349,9 @@ def validate_inventory(data):
         errors["serial"] = "Serial No. is required."
     return errors
 
+# ═══════════════════════════════════════════════════════════════════
 # ADD INVENTORY DIALOG
-# ====================
+# ═══════════════════════════════════════════════════════════════════
 @st.dialog("📝 Add Inventory", width="large")
 def add_inventory_dialog():
     errors = st.session_state.add_errors or {}
@@ -353,19 +362,17 @@ def add_inventory_dialog():
     warranty_options = fetch_distinct("warranty_status")
     status_options   = fetch_distinct("status")
     received_options = fetch_distinct("received_from")
-    # if errors:
-    #     st.error("⚠️ Please fill in all required fields marked with * before saving.")
+
     if errors:
         st.markdown(
-            # ":orange-badge[⚠️ Please enter the highlighted fields below.]"
             ":orange-badge[⚠️ Please fill in all required fields marked with * before saving.]"
-            )
+        )
+
     # ── Row 1: Brand | Category | Model | Serial No ──────
     r1c1, r1c2, r1c3, r1c4 = st.columns(4)
 
     with r1c1:
         st.markdown("Brand <span style='color:red'>*</span>", unsafe_allow_html=True)
-
         brand_input = st_smart_text_input(
             label="",
             options=brand_options,
@@ -374,19 +381,17 @@ def add_inventory_dialog():
         )
         if brand_input is not None:
             st.session_state["add_brand_value"] = brand_input
-        
         if "brand" in errors:
             st.markdown(
-                    f"<p style='color:red; font-size:13px;'>{errors['brand']}</p>",
-                    unsafe_allow_html=True
-                    )
-            # st.caption(f":red[{errors['brand']}]")
+                f"<p style='color:red; font-size:13px;'>{errors['brand']}</p>",
+                unsafe_allow_html=True
+            )
+
     with r1c2:
         st.text_input("Category", value=st.session_state.get("add_category", "Laptop"), key="add_category")
 
     with r1c3:
         st.markdown("Model <span style='color:red'>*</span>", unsafe_allow_html=True)
-
         model_input = st_smart_text_input(
             label="",
             options=model_options,
@@ -395,16 +400,14 @@ def add_inventory_dialog():
         )
         if model_input is not None:
             st.session_state["add_model_value"] = model_input
-        
         if "model" in errors:
             st.markdown(
-                    f"<p style='color:red; font-size:13px;'>{errors['model']}</p>",
-                    unsafe_allow_html=True
-                    )
-            # st.caption(f":red[{errors['model']}]")
+                f"<p style='color:red; font-size:13px;'>{errors['model']}</p>",
+                unsafe_allow_html=True
+            )
+
     with r1c4:
         st.markdown("Serial No. <span style='color:red'>*</span>", unsafe_allow_html=True)
-
         serial_input = st_smart_text_input(
             label="",
             options=serial_options,
@@ -413,13 +416,12 @@ def add_inventory_dialog():
         )
         if serial_input is not None:
             st.session_state["add_serial_value"] = serial_input
-        
         if "serial" in errors:
             st.markdown(
-                    f"<p style='color:red; font-size:13px;'>{errors['serial']}</p>",
-                    unsafe_allow_html=True
-                    )
-            # st.caption(f":red[{errors['serial']}]")
+                f"<p style='color:red; font-size:13px;'>{errors['serial']}</p>",
+                unsafe_allow_html=True
+            )
+
     st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
 
     # ── Row 2: Qty | Warranty | Status | Status-2 ──
@@ -443,7 +445,6 @@ def add_inventory_dialog():
             label="Status",
             options=status_options,
             placeholder="Type or select status...",
-            # placeholder="Issued / In-Inventory...",
             key="add_status"
         )
         if status_input is not None:
@@ -503,36 +504,35 @@ def add_inventory_dialog():
 
     # ── Buttons ──
     col1, col2 = st.columns(2)
-    save_clicked   = col1.button("💾 Save",    key="add_save_btn",   use_container_width=True, type="primary")
-    cancel_clicked = col2.button("❌ Cancel",  key="add_cancel_btn", use_container_width=True)
+    save_clicked   = col1.button("💾 Save",   key="add_save_btn",   use_container_width=True, type="primary")
+    cancel_clicked = col2.button("❌ Cancel", key="add_cancel_btn", use_container_width=True)
 
     # ── Cancel ──
     if cancel_clicked:
-        st.session_state.add_errors      = {}
-        st.session_state.show_add_dialog = False
-        for key in ["add_brand_value", "add_model_value", "add_serial_value", "add_warranty_value", "add_status_value", "add_received_value"]:
+        st.session_state.add_errors    = {}
+        st.session_state.active_dialog = None
+        for key in ["add_brand_value", "add_model_value", "add_serial_value",
+                    "add_warranty_value", "add_status_value", "add_received_value"]:
             st.session_state.pop(key, None)
         for k in [k for k in st.session_state if k.startswith("add_")]:
             st.session_state.pop(k, None)
         st.rerun()
 
-    # ── Save Action Logic with Double Fallback ──
+    # ── Save ──
     if save_clicked:
-        # Dynamic fallback matching: Variable value OR native SessionState buffer
-        final_brand = st.session_state.get("add_brand_value", "") or st.session_state.get("add_brand", "")
-        final_model = st.session_state.get("add_model_value", "") or st.session_state.get("add_model", "")
-        final_serial = st.session_state.get("add_serial_value", "") or st.session_state.get("add_serial", "")
+        # Double fallback: component value OR native session state buffer
+        final_brand    = st.session_state.get("add_brand_value",    "") or st.session_state.get("add_brand",    "")
+        final_model    = st.session_state.get("add_model_value",    "") or st.session_state.get("add_model",    "")
+        final_serial   = st.session_state.get("add_serial_value",   "") or st.session_state.get("add_serial",   "")
         final_warranty = st.session_state.get("add_warranty_value", "") or st.session_state.get("add_warranty", "")
-        final_status = st.session_state.get("add_status_value", "") or st.session_state.get("add_status", "")
+        final_status   = st.session_state.get("add_status_value",   "") or st.session_state.get("add_status",   "")
         final_received = st.session_state.get("add_received_value", "") or st.session_state.get("add_received", "")
 
-        form_data = {
+        errors = validate_inventory({
             "brand":  final_brand,
             "model":  final_model,
             "serial": final_serial,
-        }
-        
-        errors = validate_inventory(form_data)
+        })
         st.session_state.add_errors = errors
 
         if errors:
@@ -545,13 +545,13 @@ def add_inventory_dialog():
         return_date = st.session_state.get("add_return_date", None) if _return_type == "Set Date" else None
 
         insert_inventory((
-            final_brand or "",
-            final_model or "",
-            final_serial or "",
+            final_brand    or "",
+            final_model    or "",
+            final_serial   or "",
             st.session_state.get("add_category", "") or "",
             final_warranty or "",
             st.session_state.get("add_qty", 1),
-            final_status or "",
+            final_status   or "",
             st.session_state.get("add_handover", "") or "",
             issue_date,
             final_received or "",
@@ -562,9 +562,10 @@ def add_inventory_dialog():
 
         fetch_distinct.clear()
 
-        st.session_state.add_errors      = {}
-        st.session_state.show_add_dialog = False
-        for key in ["add_brand_value", "add_model_value", "add_serial_value", "add_warranty_value", "add_status_value", "add_received_value"]:
+        st.session_state.add_errors    = {}
+        st.session_state.active_dialog = None
+        for key in ["add_brand_value", "add_model_value", "add_serial_value",
+                    "add_warranty_value", "add_status_value", "add_received_value"]:
             st.session_state.pop(key, None)
         for k in [k for k in st.session_state if k.startswith("add_")]:
             st.session_state.pop(k, None)
@@ -573,11 +574,12 @@ def add_inventory_dialog():
         time.sleep(0.5)
         st.rerun()
 
+# ═══════════════════════════════════════════════════════════════════
 # EDIT INVENTORY DIALOG
-# =====================
+# ═══════════════════════════════════════════════════════════════════
 @st.dialog("✏️ Edit Inventory", width="large")
 def edit_inventory_dialog():
-    row = st.session_state.edit_row
+    row = st.session_state.edit_row_data
 
     with st.form("edit_form"):
         r1c1, r1c2, r1c3, r1c4 = st.columns(4)
@@ -649,25 +651,10 @@ def edit_inventory_dialog():
         st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
         note   = st.text_area("📝 Note", value=row.get("note") or "", height=80)
         c1, c2 = st.columns(2)
-        save   = c1.form_submit_button("💾 Save",use_container_width=True,type="primary")
-        # save   = c1.form_submit_button("💾 Save",    key="add_save_btn",   use_container_width=True, type="primary")
-        cancel = c2.form_submit_button("❌ Cancel",use_container_width=True)
+        save   = c1.form_submit_button("💾 Save",   use_container_width=True)
+        # save   = c1.form_submit_button("💾 Save",    use_container_width=True, type="primary")
+        cancel = c2.form_submit_button("❌ Cancel", use_container_width=True)
 
-    # if save:
-    #     update_inventory((
-    #         brand, model, serial, category,
-    #         warranty, qty, status,
-    #         handover, issue_final,
-    #         received, return_final,
-    #         note, status_2,
-    #         row["id"],
-    #     ))
-    #     st.success("#### ✅ Updated Successfully!")
-    #     time.sleep(0.5)
-    #     st.rerun()
-
-    # if cancel:
-    #     st.rerun()
     if save:
         update_inventory((
             brand, model, serial, category,
@@ -676,20 +663,21 @@ def edit_inventory_dialog():
             received, return_final,
             note, status_2,
             row["id"],
-            ))
-        
-        st.session_state.edit_row = None
-        
+        ))
+        st.session_state.edit_row_data  = None
+        st.session_state.active_dialog  = None
         st.success("#### ✅ Updated Successfully!")
         time.sleep(0.5)
         st.rerun()
-        
+
     if cancel:
-        st.session_state.edit_row = None
+        st.session_state.edit_row_data  = None
+        st.session_state.active_dialog  = None
         st.rerun()
 
+# ═══════════════════════════════════════════════════════════════════
 # CONFIRM DELETE DIALOG
-# =====================
+# ═══════════════════════════════════════════════════════════════════
 @st.dialog("🗑️ Confirm Delete")
 def confirm_delete_dialog():
     item_id    = st.session_state.delete_id
@@ -702,25 +690,29 @@ def confirm_delete_dialog():
     with c1:
         if st.button("🗑️ Yes, Delete", type="primary", use_container_width=True):
             delete_inventory(item_id)
-            st.session_state.delete_id    = None
-            st.session_state.delete_label = ""
+            st.session_state.delete_id     = None
+            st.session_state.delete_label  = ""
+            st.session_state.active_dialog = None
             st.info("#### 🗑️ Deleted Successfully!")
             time.sleep(0.5)
             st.rerun()
     with c2:
         if st.button("❌ Cancel", use_container_width=True):
-            st.session_state.delete_id    = None
-            st.session_state.delete_label = ""
+            st.session_state.delete_id     = None
+            st.session_state.delete_label  = ""
+            st.session_state.active_dialog = None
             st.rerun()
 
+# ═══════════════════════════════════════════════════════════════════
 # LOAD DATA
-# =========
+# ═══════════════════════════════════════════════════════════════════
 df = fetch_inventory()
 if not df.empty:
     df.columns = df.columns.str.strip().str.lower()
 
+# ═══════════════════════════════════════════════════════════════════
 # TOP HEADER ROW
-# ==============
+# ═══════════════════════════════════════════════════════════════════
 title_col, add_col, pdf_col, excel_col = st.columns(
     [6, 1.1, 1.1, 1.1], vertical_alignment="center"
 )
@@ -730,10 +722,7 @@ with title_col:
 
 with add_col:
     if st.button("Add Inventory", icon=":material/add_box:", key="add_inv_btn", use_container_width=True):
-        st.session_state.show_add_dialog = True
-
-if st.session_state.get("show_add_dialog", False):
-    add_inventory_dialog()
+        st.session_state.active_dialog = "add"
 
 with pdf_col:
     pdf_bytes = generate_inventory_pdf(df)
@@ -757,24 +746,26 @@ with excel_col:
         key="excel_btn",
     )
 
+# ═══════════════════════════════════════════════════════════════════
 # METRICS
-# =======
+# ═══════════════════════════════════════════════════════════════════
 total     = len(df)
-Issued    = len(df[df["status"].str.lower().isin(["issued", "given", "in use"])]) if not df.empty else 0
-Available = len(df[df["status"].str.lower().isin(["in-inventory", "inventory"])]) if not df.empty else 0
-Damaged   = len(df[df["status"].str.lower().isin(["damaged", "broken","maintenance"])]) if not df.empty else 0
+Issued    = len(df[df["status"].str.lower().isin(["issued","given", "in use"])]) if not df.empty else 0
+Available = len(df[df["status"].str.lower().isin(["in-inventory", "inventory", "available","in inventory","in stock"])]) if not df.empty else 0
+Damaged   = len(df[df["status"].str.lower().isin(["damaged", "broken", "maintenance"])]) if not df.empty else 0
 
 with st.container(key="metrics_row"):
     c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Total",total)
-    c2.metric("Issued",Issued)
-    c3.metric("In-Inventory",Available)
-    c4.metric("Damaged",Damaged)
+    c1.metric("Total",       total)
+    c2.metric("Issued",      Issued)
+    c3.metric("In-Inventory", Available)
+    c4.metric("Damaged",     Damaged)
 
+# ═══════════════════════════════════════════════════════════════════
 # SEARCH + REFRESH
-# ================
+# ═══════════════════════════════════════════════════════════════════
 if st.session_state.get("do_clear_search"):
-    st.session_state.search_box = ""
+    st.session_state.search_box      = ""
     st.session_state.do_clear_search = False
     st.rerun()
 
@@ -808,8 +799,9 @@ if search2 and search2.strip():
 list_df = list_df.reset_index(drop=True)
 list_df["s_no"] = list_df.index + 1
 
+# ═══════════════════════════════════════════════════════════════════
 # TABLE — HEADER
-# ==============
+# ═══════════════════════════════════════════════════════════════════
 with st.container(key="header_row"):
     h0,h1,h2,h3,h4,h5,h6,h7,h8,h9,h10,h11,h12,h13,h14,h15 = st.columns(COL_WIDTHS, gap="small")
     h0.badge("S.No");        h1.badge("Brand");          h2.badge("Model")
@@ -818,8 +810,9 @@ with st.container(key="header_row"):
     h9.badge("Issue Date");  h10.badge("Received From"); h11.badge("Return Date")
     h12.badge("Note");       h13.badge("Status-2");      h14.badge("Edit"); h15.badge("Del.")
 
+# ═══════════════════════════════════════════════════════════════════
 # TABLE — DATA ROWS
-# =================
+# ═══════════════════════════════════════════════════════════════════
 def small(val):
     return f'<p style="font-size:12px;margin:0">{val}</p>'
 
@@ -855,35 +848,26 @@ for _, row in list_df.iterrows():
         c12.markdown(small(safe_val(row.get("note"))),           unsafe_allow_html=True)
         c13.markdown(small(safe_val(row.get("status_2"))),       unsafe_allow_html=True)
 
-        # if c14.button("✏️", key=f"edit_{uid}"):
-        #     st.session_state.edit_row = row.to_dict()
-        #     edit_inventory_dialog()
-
-        # if c15.button(":material/delete:", key=f"del_{uid}"):
-        #     brand_val  = safe_val(row["brand"])
-        #     model_val  = safe_val(row["model"])
-        #     serial_val = safe_val(row["serial_no"])
-        #     st.session_state.delete_id    = row["id"]
-        #     st.session_state.delete_label = f"{brand_val} — {model_val} (S/No: {serial_val})"
-        #     confirm_delete_dialog()
-
         if c14.button("✏️", key=f"edit_{uid}"):
-            st.session_state.edit_row = row.to_dict()
-            # st.rerun()
-            
+            st.session_state.edit_row_data  = row.to_dict()
+            st.session_state.active_dialog  = "edit"
+
         if c15.button(":material/delete:", key=f"del_{uid}"):
             brand_val  = safe_val(row["brand"])
             model_val  = safe_val(row["model"])
             serial_val = safe_val(row["serial_no"])
-            
-            st.session_state.delete_id = row["id"]
-            st.session_state.delete_label = f"{brand_val} — {model_val} (S/No: {serial_val})"
-            # st.rerun()
+            st.session_state.delete_id     = row["id"]
+            st.session_state.delete_label  = f"{brand_val} — {model_val} (S/No: {serial_val})"
+            st.session_state.active_dialog = "delete"
 
-if st.session_state.edit_row is not None:
+# ═══════════════════════════════════════════════════════════════════
+# SINGLE DIALOG DISPATCHER  —  only one dialog open at a time
+# ═══════════════════════════════════════════════════════════════════
+if st.session_state.active_dialog == "add":
+    add_inventory_dialog()
+elif st.session_state.active_dialog == "edit":
     edit_inventory_dialog()
-
-if st.session_state.delete_id is not None:
+elif st.session_state.active_dialog == "delete":
     confirm_delete_dialog()
 
 st.divider()
