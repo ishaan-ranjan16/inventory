@@ -1,8 +1,5 @@
-streamlit
-pandas
-psycopg2-binary
-python-dotenv
-reportlab
-openpyxl
-
-# st_smart_text_input.
+streamlit>=1.35.0
+pandas>=2.0.0
+openpyxl>=3.1.0
+reportlab>=4.1.0
+streamlit-smart-text-input>=0.1.2

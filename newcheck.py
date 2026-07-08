@@ -16,7 +16,7 @@ st.set_page_config(page_title="Inventory", layout="wide")
 st.markdown("""
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <style>
-        html { zoom: 69%; }
+        html { zoom: 71%; }
 
         .block-container {
             padding-top: 0rem;
@@ -376,7 +376,7 @@ def add_inventory_dialog():
         brand_input = st_smart_text_input(
             label="",
             options=brand_options,
-            placeholder="Type or select brand...",
+            placeholder="Brand",
             key="add_brand"
         )
         if brand_input is not None:
@@ -388,14 +388,15 @@ def add_inventory_dialog():
             )
 
     with r1c2:
-        st.text_input("Category", value=st.session_state.get("add_category", "Laptop"), key="add_category")
+        st.markdown("Category")
+        st.text_input("", value=st.session_state.get("add_category", "Laptop"), key="add_category")
 
     with r1c3:
         st.markdown("Model <span style='color:red'>*</span>", unsafe_allow_html=True)
         model_input = st_smart_text_input(
             label="",
             options=model_options,
-            placeholder="Type or select model...",
+            placeholder="Model",
             key="add_model"
         )
         if model_input is not None:
@@ -411,7 +412,7 @@ def add_inventory_dialog():
         serial_input = st_smart_text_input(
             label="",
             options=serial_options,
-            placeholder="Type or select serial...",
+            placeholder="S No.",
             key="add_serial"
         )
         if serial_input is not None:
@@ -434,7 +435,7 @@ def add_inventory_dialog():
         warranty_input = st_smart_text_input(
             label="Warranty Status",
             options=warranty_options,
-            placeholder="Type or select Warranty info...",
+            placeholder="Warranty",
             key="add_warranty"
         )
         if warranty_input is not None:
@@ -444,7 +445,7 @@ def add_inventory_dialog():
         status_input = st_smart_text_input(
             label="Status",
             options=status_options,
-            placeholder="Type or select status...",
+            placeholder="Status",
             key="add_status"
         )
         if status_input is not None:
@@ -465,7 +466,7 @@ def add_inventory_dialog():
         received_input = st_smart_text_input(
             label="Received From",
             options=received_options,
-            placeholder="Vendor / Person / IT...",
+            placeholder="Vendor / Person / IT",
             key="add_received"
         )
         if received_input is not None:

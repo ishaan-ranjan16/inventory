@@ -15,7 +15,7 @@ from streamlit_smart_text_input import st_smart_text_input
 # ═══════════════════════════════════════════════════════════════════
 # INITIALIZATION & PAGE CONFIG
 # ═══════════════════════════════════════════════════════════════════
-st.set_page_config(page_title="Inventory Management", layout="wide")
+st.set_page_config(page_title="Inventory", layout="wide")
 
 # ═══════════════════════════════════════════════════════════════════
 # DATABASE USER TABLE INITIALIZATION
@@ -174,7 +174,7 @@ if not st.session_state.logged_in:
 st.markdown("""
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <style>
-        html { zoom: 69%; }
+        html { zoom: 73%; }
 
         .block-container {
             padding-top: 0rem;
@@ -507,19 +507,19 @@ def add_inventory_dialog():
     r1c1, r1c2, r1c3, r1c4 = st.columns(4)
     with r1c1:
         st.markdown("Brand <span style='color:red'>*</span>", unsafe_allow_html=True)
-        brand_input = st_smart_text_input(label="", options=brand_options, placeholder="Type/select brand...", key="add_brand")
+        brand_input = st_smart_text_input(label="", options=brand_options, placeholder="Type or select brand...", key="add_brand")
         if brand_input is not None: st.session_state["add_brand_value"] = brand_input
         if "brand" in errors: st.markdown(f"<p style='color:red; font-size:13px;'>{errors['brand']}</p>", unsafe_allow_html=True)
     with r1c2:
         st.text_input("Category", value=st.session_state.get("add_category", "Laptop"), key="add_category")
     with r1c3:
         st.markdown("Model <span style='color:red'>*</span>", unsafe_allow_html=True)
-        model_input = st_smart_text_input(label="", options=model_options, placeholder="Type/select...", key="add_model")
+        model_input = st_smart_text_input(label="", options=model_options, placeholder="Type or select model...", key="add_model")
         if model_input is not None: st.session_state["add_model_value"] = model_input
         if "model" in errors: st.markdown(f"<p style='color:red; font-size:13px;'>{errors['model']}</p>", unsafe_allow_html=True)
     with r1c4:
         st.markdown("Serial No. <span style='color:red'>*</span>", unsafe_allow_html=True)
-        serial_input = st_smart_text_input(label="", options=serial_options, placeholder="Type/select...", key="add_serial")
+        serial_input = st_smart_text_input(label="", options=serial_options, placeholder="Type or select serial no...", key="add_serial")
         if serial_input is not None: st.session_state["add_serial_value"] = serial_input
         if "serial" in errors: st.markdown(f"<p style='color:red; font-size:13px;'>{errors['serial']}</p>", unsafe_allow_html=True)
 
@@ -529,10 +529,10 @@ def add_inventory_dialog():
     with r2c1:
         st.number_input("Quantity", min_value=1, value=st.session_state.get("add_qty", 1), key="add_qty")
     with r2c2:
-        warranty_input = st_smart_text_input(label="Warranty Status", options=warranty_options, placeholder="Type/select...", key="add_warranty")
+        warranty_input = st_smart_text_input(label="Warranty Status", options=warranty_options, placeholder="Type or select warranty status...", key="add_warranty")
         if warranty_input is not None: st.session_state["add_warranty_value"] = warranty_input
     with r2c3:
-        status_input = st_smart_text_input(label="Status", options=status_options, placeholder="Type/select...", key="add_status")
+        status_input = st_smart_text_input(label="Status", options=status_options, placeholder="Type or select status...", key="add_status")
         if status_input is not None: st.session_state["add_status_value"] = status_input
     with r2c4:
         st.text_input("Status-2", key="add_status2")
@@ -542,7 +542,7 @@ def add_inventory_dialog():
     r3c1, r3c2 = st.columns(2)
     with r3c1:  st.text_input("Handover To", key="add_handover")
     with r3c2:
-        received_input = st_smart_text_input(label="Received From", options=received_options, placeholder="Vendor/IT...", key="add_received")
+        received_input = st_smart_text_input(label="Received From", options=received_options, placeholder="Vendor / Person / IT...", key="add_received")
         if received_input is not None: st.session_state["add_received_value"] = received_input
 
     st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
@@ -599,7 +599,6 @@ def add_inventory_dialog():
         st.success("#### ✅ Saved Successfully!")
         time.sleep(0.4)
         st.rerun()
-
 # ═══════════════════════════════════════════════════════════════════
 # EDIT INVENTORY DIALOG
 # ═══════════════════════════════════════════════════════════════════
@@ -654,7 +653,6 @@ def edit_inventory_dialog():
         st.session_state.edit_row_data  = None
         st.session_state.active_dialog  = None
         st.rerun()
-
 # ═══════════════════════════════════════════════════════════════════
 # CONFIRM DELETE DIALOG
 # ═══════════════════════════════════════════════════════════════════
