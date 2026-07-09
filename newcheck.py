@@ -101,18 +101,18 @@ st.markdown("""
 
 """, unsafe_allow_html=True)
 
-# ═══════════════════════════════════════════════════════════════════
-# SESSION STATE  —  single active_dialog gate
-# ═══════════════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════
+# SESSION STATE — single active_dialog gate
+# ═══════════════════════════════════════════
 if "active_dialog"  not in st.session_state: st.session_state.active_dialog  = None   # "add" | "edit" | "delete" | None
 if "edit_row_data"  not in st.session_state: st.session_state.edit_row_data  = None   # dict of the row being edited
 if "delete_id"      not in st.session_state: st.session_state.delete_id      = None
 if "delete_label"   not in st.session_state: st.session_state.delete_label   = ""
 if "add_errors"     not in st.session_state: st.session_state.add_errors     = {}
 
-# ═══════════════════════════════════════════════════════════════════
+# ════════════════════════════════════════════
 # AUTOCOMPLETE — FETCH DISTINCT VALUES FROM DB
-# ═══════════════════════════════════════════════════════════════════
+# ════════════════════════════════════════════
 @st.cache_data(ttl=300)
 def fetch_distinct(column):
     try:
@@ -129,9 +129,9 @@ def fetch_distinct(column):
     except Exception:
         return []
 
-# ═══════════════════════════════════════════════════════════════════
+# ════════════
 # DATE HELPERS
-# ═══════════════════════════════════════════════════════════════════
+# ════════════
 def safe_date(val):
     if val is None or (isinstance(val, str) and val.strip() == ""):
         return date.today()
@@ -162,9 +162,9 @@ def _safe_date_str(val):
             return None
     return None
 
-# ═══════════════════════════════════════════════════════════════════
+# ══════════════════
 # DATABASE FUNCTIONS
-# ═══════════════════════════════════════════════════════════════════
+# ══════════════════
 def fetch_inventory():
     columns = [
         "id", "brand", "model", "serial_no", "item_category", "quantity",
@@ -235,9 +235,9 @@ def delete_inventory(row_id):
     cur.close()
     conn.close()
 
-# ═══════════════════════════════════════════════════════════════════
+# ════════════
 # EXCEL EXPORT
-# ═══════════════════════════════════════════════════════════════════
+# ════════════
 def generate_inventory_excel(data: pd.DataFrame) -> bytes:
     buffer    = io.BytesIO()
     export_df = data.reset_index(drop=True).copy()
@@ -268,9 +268,9 @@ def generate_inventory_excel(data: pd.DataFrame) -> bytes:
     buffer.seek(0)
     return buffer.getvalue()
 
-# ═══════════════════════════════════════════════════════════════════
+# ════════════
 # PDF EXPORT
-# ═══════════════════════════════════════════════════════════════════
+# ════════════
 def generate_inventory_pdf(data: pd.DataFrame) -> bytes:
     buffer = io.BytesIO()
     doc    = SimpleDocTemplate(
@@ -323,9 +323,9 @@ def generate_inventory_pdf(data: pd.DataFrame) -> bytes:
     buffer.seek(0)
     return buffer.getvalue()
 
-# ═══════════════════════════════════════════════════════════════════
+# ════════════════════════
 # DIALOG — SCROLLBAR STYLE
-# ═══════════════════════════════════════════════════════════════════
+# ════════════════════════
 st.markdown("""
     <style>
     div[data-testid="stDialog"] *::-webkit-scrollbar       { width: 10px; }
@@ -336,9 +336,9 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# ═══════════════════════════════════════════════════════════════════
+# ══════════
 # VALIDATION
-# ═══════════════════════════════════════════════════════════════════
+# ══════════
 def validate_inventory(data):
     errors = {}
     if not (data.get("brand") or "").strip():
@@ -349,9 +349,9 @@ def validate_inventory(data):
         errors["serial"] = "Serial No. is required."
     return errors
 
-# ═══════════════════════════════════════════════════════════════════
+# ════════════════════
 # ADD INVENTORY DIALOG
-# ═══════════════════════════════════════════════════════════════════
+# ════════════════════
 @st.dialog("📝 Add Inventory", width="large")
 def add_inventory_dialog():
     errors = st.session_state.add_errors or {}
@@ -575,9 +575,9 @@ def add_inventory_dialog():
         time.sleep(0.5)
         st.rerun()
 
-# ═══════════════════════════════════════════════════════════════════
+# ═════════════════════
 # EDIT INVENTORY DIALOG
-# ═══════════════════════════════════════════════════════════════════
+# ═════════════════════
 @st.dialog("✏️ Edit Inventory", width="large")
 def edit_inventory_dialog():
     row = st.session_state.edit_row_data
@@ -653,7 +653,6 @@ def edit_inventory_dialog():
         note   = st.text_area("📝 Note", value=row.get("note") or "", height=80)
         c1, c2 = st.columns(2)
         save   = c1.form_submit_button("💾 Save",   use_container_width=True)
-        # save   = c1.form_submit_button("💾 Save",    use_container_width=True, type="primary")
         cancel = c2.form_submit_button("❌ Cancel", use_container_width=True)
 
     if save:
@@ -676,9 +675,9 @@ def edit_inventory_dialog():
         st.session_state.active_dialog  = None
         st.rerun()
 
-# ═══════════════════════════════════════════════════════════════════
+# ═════════════════════
 # CONFIRM DELETE DIALOG
-# ═══════════════════════════════════════════════════════════════════
+# ═════════════════════
 @st.dialog("🗑️ Confirm Delete")
 def confirm_delete_dialog():
     item_id    = st.session_state.delete_id
@@ -704,16 +703,16 @@ def confirm_delete_dialog():
             st.session_state.active_dialog = None
             st.rerun()
 
-# ═══════════════════════════════════════════════════════════════════
+# ═════════
 # LOAD DATA
-# ═══════════════════════════════════════════════════════════════════
+# ═════════
 df = fetch_inventory()
 if not df.empty:
     df.columns = df.columns.str.strip().str.lower()
 
-# ═══════════════════════════════════════════════════════════════════
+# ══════════════
 # TOP HEADER ROW
-# ═══════════════════════════════════════════════════════════════════
+# ══════════════
 title_col, add_col, pdf_col, excel_col = st.columns(
     [6, 1.1, 1.1, 1.1], vertical_alignment="center"
 )
@@ -747,9 +746,9 @@ with excel_col:
         key="excel_btn",
     )
 
-# ═══════════════════════════════════════════════════════════════════
+# ═══════
 # METRICS
-# ═══════════════════════════════════════════════════════════════════
+# ═══════
 total     = len(df)
 Issued    = len(df[df["status"].str.lower().isin(["issued","given", "in use"])]) if not df.empty else 0
 Available = len(df[df["status"].str.lower().isin(["in-inventory", "inventory", "available","in inventory","in stock"])]) if not df.empty else 0
@@ -762,9 +761,9 @@ with st.container(key="metrics_row"):
     c3.metric("In-Inventory", Available)
     c4.metric("Damaged",     Damaged)
 
-# ═══════════════════════════════════════════════════════════════════
+# ════════════════
 # SEARCH + REFRESH
-# ═══════════════════════════════════════════════════════════════════
+# ════════════════
 if st.session_state.get("do_clear_search"):
     st.session_state.search_box      = ""
     st.session_state.do_clear_search = False
@@ -800,9 +799,9 @@ if search2 and search2.strip():
 list_df = list_df.reset_index(drop=True)
 list_df["s_no"] = list_df.index + 1
 
-# ═══════════════════════════════════════════════════════════════════
+# ══════════════
 # TABLE — HEADER
-# ═══════════════════════════════════════════════════════════════════
+# ══════════════
 with st.container(key="header_row"):
     h0,h1,h2,h3,h4,h5,h6,h7,h8,h9,h10,h11,h12,h13,h14,h15 = st.columns(COL_WIDTHS, gap="small")
     h0.badge("S.No");        h1.badge("Brand");          h2.badge("Model")
@@ -811,9 +810,9 @@ with st.container(key="header_row"):
     h9.badge("Issue Date");  h10.badge("Received From"); h11.badge("Return Date")
     h12.badge("Note");       h13.badge("Status-2");      h14.badge("Edit"); h15.badge("Del.")
 
-# ═══════════════════════════════════════════════════════════════════
+# ═════════════════
 # TABLE — DATA ROWS
-# ═══════════════════════════════════════════════════════════════════
+# ═════════════════
 def small(val):
     return f'<p style="font-size:12px;margin:0">{val}</p>'
 
@@ -860,10 +859,9 @@ for _, row in list_df.iterrows():
             st.session_state.delete_id     = row["id"]
             st.session_state.delete_label  = f"{brand_val} — {model_val} (S/No: {serial_val})"
             st.session_state.active_dialog = "delete"
-
-# ═══════════════════════════════════════════════════════════════════
-# SINGLE DIALOG DISPATCHER  —  only one dialog open at a time
-# ═══════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════
+# SINGLE DIALOG DISPATCHER — only one dialog open at a time
+# ═════════════════════════════════════════════════════════
 if st.session_state.active_dialog == "add":
     add_inventory_dialog()
 elif st.session_state.active_dialog == "edit":

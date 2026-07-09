@@ -538,7 +538,6 @@ def validate_inventory(data):
 
     return errors
 
-
 # ---------------- ADD INVENTORY DIALOG ----------------
 @st.dialog("📝 Add Inventory", width="large")
 def add_inventory_dialog():
