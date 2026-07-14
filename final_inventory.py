@@ -264,9 +264,9 @@ def generate_inventory_excel(data: pd.DataFrame) -> bytes:
     buffer.seek(0)
     return buffer.getvalue()
 
-# ════════════
+# ══════════
 # PDF EXPORT
-# ════════════
+# ══════════
 def generate_inventory_pdf(data: pd.DataFrame) -> bytes:
     buffer = io.BytesIO()
     doc    = SimpleDocTemplate(
