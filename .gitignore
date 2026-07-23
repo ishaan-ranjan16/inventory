@@ -11,5 +11,5 @@ tests/
 pytest.ini
 
 # Ignore the test script
-test.py
-Inventory-test.py
+
+# ista.py

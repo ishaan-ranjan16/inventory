@@ -1,11 +1,11 @@
-# import sqlite3
+import sqlite3
 
-# conn = sqlite3.connect("inventory.db")
-# cur = conn.cursor()
+conn = sqlite3.connect("inventory.db")
+cur = conn.cursor()
 
-# cur.execute("SELECT * FROM inventory")
-# print(cur.fetchall())
+cur.execute("SELECT * FROM inventory")
+print(cur.fetchall())
 
-# conn.close()
-import streamlit as st
-st.write(st.__version__)
+conn.close()
+# import streamlit as st
+# st.write(st.__version__)

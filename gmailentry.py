@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 from datetime import date, datetime
 import io
+import smtplib
+from email.message import EmailMessage
 from db_connection import get_connection
 import time
 from reportlab.lib.pagesizes import landscape, A4
@@ -91,21 +93,18 @@ st.markdown("""
             border-bottom: 1px solid #eef0f3;
         }
 
-        /* Add dialog save/cancel buttons */
         .st-key-add_save_btn button {
             background-color: #1f77b4 !important;
             color: white !important;
         }
-
 </style>
-
 """, unsafe_allow_html=True)
 
 # ═══════════════════════════════════════════
 # SESSION STATE — single active_dialog gate
 # ═══════════════════════════════════════════
-if "active_dialog"  not in st.session_state: st.session_state.active_dialog  = None   # "add" | "edit" | "delete" | None
-if "edit_row_data"  not in st.session_state: st.session_state.edit_row_data  = None   # dict of the row being edited
+if "active_dialog"  not in st.session_state: st.session_state.active_dialog  = None
+if "edit_row_data"  not in st.session_state: st.session_state.edit_row_data  = None
 if "delete_id"      not in st.session_state: st.session_state.delete_id      = None
 if "delete_label"   not in st.session_state: st.session_state.delete_label   = ""
 if "add_errors"     not in st.session_state: st.session_state.add_errors     = {}
@@ -162,6 +161,55 @@ def _safe_date_str(val):
             return None
     return None
 
+# ═══════════════════════════════════
+# AUTOMATED GMAIL NOTIFICATION ENGINE
+# ═══════════════════════════════════
+def send_gmail_notification(subject: str, body_content: str):
+    """
+    Quietly fetches credentials from secrets.toml and sends a background 
+    notification through the Gmail SMTP server network.
+    """
+    try:
+        sender = st.secrets["SENDER_EMAIL"]
+        password = st.secrets["SENDER_PASSWORD"]
+        to_field = st.secrets["NOTIFICATION_TO"]
+        cc_field = st.secrets.get("NOTIFICATION_CC", "")
+    except KeyError:
+        # Gracefully log warning in dashboard if secrets are missing
+        st.warning("⚠️ Background alert couldn't be sent: Missing SMTP keys in secrets.toml.")
+        return
+
+    # Split lists securely
+    to_list = [e.strip() for e in to_field.split(",") if e.strip()]
+    cc_list = [e.strip() for e in cc_field.split(",") if e.strip()] if cc_field else []
+
+    if not to_list or not sender or not password:
+        return
+
+    # Target strictly Gmail SMTP environment
+    host, port = "smtp.gmail.com", 587
+
+    msg = EmailMessage()
+    msg["Subject"] = subject
+    msg["From"] = sender
+    msg["To"] = ", ".join(to_list)
+    if cc_list:
+        msg["Cc"] = ", ".join(cc_list)
+
+    msg.set_content(body_content)
+    all_recipients = to_list + cc_list
+
+    try:
+        with smtplib.SMTP(host, port) as smtp:
+            smtp.starttls()
+            smtp.login(sender, password)
+            # smtp.send_message(msg, to_addrs=all_recipients)
+            smtp.send_message(msg)
+    except Exception as e:
+        # This will print the exact reason (e.g., "Authentication Failed") to your terminal console
+        print(f"!!! SMTP BACKEND CRASH ERROR: {e}") 
+        st.error(f"⚠️ Automated email notification pipeline failure: {e}")
+
 # ══════════════════
 # DATABASE FUNCTIONS
 # ══════════════════
@@ -186,16 +234,15 @@ def fetch_inventory():
         conn.close()
         return pd.DataFrame([tuple(r) for r in rows], columns=columns)
     except Exception as e:
-        print(f"CRITICAL DATABASE ERROR: {e}")
         st.error("⚠️ Downtime Alert: Unable to connect to the inventory database. Please try again later.")
         return pd.DataFrame(columns=columns)
-
+    
 def insert_inventory(data):
     conn = get_connection()
     cur  = conn.cursor()
     clean_data       = list(data)
-    clean_data[8]    = _safe_date_str(clean_data[8])    # issue_date
-    clean_data[10]   = _safe_date_str(clean_data[10])   # return_date
+    clean_data[8]    = _safe_date_str(clean_data[8])
+    clean_data[10]   = _safe_date_str(clean_data[10])
     cur.execute("""
         INSERT INTO inventory (
             brand, model, serial_no, item_category,
@@ -209,12 +256,37 @@ def insert_inventory(data):
     cur.close()
     conn.close()
 
+    # Helper lambda to swap empty values with '—'
+    fmt = lambda val: str(val).strip() if (val is not None and str(val).strip() != "") else "—"
+
+    # Automatic background trigger on insertion
+    subject = f"➕ Inventory Registered: {fmt(clean_data[0])} ({fmt(clean_data[1])})"
+    body = (
+        f"Automated Notification: A new item has been checked into inventory.\n\n"
+        f"• Brand: {fmt(clean_data[0])}\n"
+        f"• Model: {fmt(clean_data[1])}\n"
+        f"• Serial No: {fmt(clean_data[2])}\n"
+        f"• Category: {fmt(clean_data[3])}\n"
+        f"• Warranty Status: {fmt(clean_data[4])}\n"
+        f"• Quantity: {fmt(clean_data[5])}\n"
+        f"• Status: {fmt(clean_data[6])}\n"
+        f"• Assigned/Handover To: {fmt(clean_data[7])}\n"
+        f"• Issue Date: {fmt(clean_data[8])}\n"
+        f"• Received From: {fmt(clean_data[9])}\n"
+        f"• Return Date: {fmt(clean_data[10])}\n"
+        f"• Note: {fmt(clean_data[11])}\n"
+        f"• Status-2: {fmt(clean_data[12])}\n\n"
+        f"Timestamp: {datetime.now().strftime('%d-%m-%Y %I:%M %p')}\n"
+        f"Source: Operational Inventory Engine."
+    )
+    send_gmail_notification(subject, body)
+
 def update_inventory(values):
     conn = get_connection()
     cur  = conn.cursor()
     clean_values     = list(values)
-    clean_values[8]  = _safe_date_str(clean_values[8])   # issue_date
-    clean_values[10] = _safe_date_str(clean_values[10])  # return_date
+    clean_values[8]  = _safe_date_str(clean_values[8])
+    clean_values[10] = _safe_date_str(clean_values[10])
     cur.execute("""
         UPDATE inventory
         SET brand=?, model=?, serial_no=?, item_category=?,
@@ -226,6 +298,32 @@ def update_inventory(values):
     conn.commit()
     cur.close()
     conn.close()
+
+    # Helper lambda to swap empty values with '—'
+    fmt = lambda val: str(val).strip() if (val is not None and str(val).strip() != "") else "—"
+
+    # Automatic background trigger on updates
+    subject = f"✏️ Inventory Record Modified (ID: {fmt(clean_values[13])})"
+    body = (
+        f"Automated Notification: An existing asset inventory specification has been changed.\n\n"
+        # f"• Asset ID: {fmt(clean_values[13])}\n"
+        f"• Brand: {fmt(clean_values[0])}\n"
+        f"• Model: {fmt(clean_values[1])}\n"
+        f"• Serial No: {fmt(clean_values[2])}\n"
+        f"• Category: {fmt(clean_values[3])}\n"
+        f"• Warranty Status: {fmt(clean_values[4])}\n"
+        f"• Quantity: {fmt(clean_values[5])}\n"
+        f"• Status: {fmt(clean_values[6])}\n"
+        f"• Assigned/Handover To: {fmt(clean_values[7])}\n"
+        f"• Issue Date: {fmt(clean_values[8])}\n"
+        f"• Received From: {fmt(clean_values[9])}\n"
+        f"• Return Date: {fmt(clean_values[10])}\n"
+        f"• Note: {fmt(clean_values[11])}\n"
+        f"• Status-2: {fmt(clean_values[12])}\n\n"
+        f"Timestamp: {datetime.now().strftime('%d-%m-%Y %I:%M %p')}\n"
+        f"Source: Operational Inventory Engine."
+    )
+    send_gmail_notification(subject, body)
 
 def delete_inventory(row_id):
     conn = get_connection()
@@ -268,9 +366,9 @@ def generate_inventory_excel(data: pd.DataFrame) -> bytes:
     buffer.seek(0)
     return buffer.getvalue()
 
-# ════════════
+# ══════════
 # PDF EXPORT
-# ════════════
+# ══════════
 def generate_inventory_pdf(data: pd.DataFrame) -> bytes:
     buffer = io.BytesIO()
     doc    = SimpleDocTemplate(
@@ -349,6 +447,14 @@ def validate_inventory(data):
         errors["serial"] = "Serial No. is required."
     return errors
 
+def _resolve(value_key: str, native_key: str) -> str:
+    """Return current snapshot directly from session state."""
+    ss = st.session_state
+    if value_key in ss:
+        return str(ss[value_key]).strip() if ss[value_key] is not None else ""
+    val = ss.get(native_key, "")
+    return str(val).strip() if val is not None else ""
+
 # ════════════════════
 # ADD INVENTORY DIALOG
 # ════════════════════
@@ -381,11 +487,11 @@ def add_inventory_dialog():
         )
         if brand_input is not None:
             st.session_state["add_brand_value"] = brand_input
+        elif "add_brand" in st.session_state and (st.session_state["add_brand"] == "" or st.session_state["add_brand"] is None):
+            st.session_state["add_brand_value"] = ""
+
         if "brand" in errors:
-            st.markdown(
-                f"<p style='color:red; font-size:13px;'>{errors['brand']}</p>",
-                unsafe_allow_html=True
-            )
+            st.markdown(f"<p style='color:red; font-size:13px;'>{errors['brand']}</p>", unsafe_allow_html=True)
 
     with r1c2:
         st.markdown("Category")
@@ -401,11 +507,11 @@ def add_inventory_dialog():
         )
         if model_input is not None:
             st.session_state["add_model_value"] = model_input
+        elif "add_model" in st.session_state and (st.session_state["add_model"] == "" or st.session_state["add_model"] is None):
+            st.session_state["add_model_value"] = ""
+
         if "model" in errors:
-            st.markdown(
-                f"<p style='color:red; font-size:13px;'>{errors['model']}</p>",
-                unsafe_allow_html=True
-            )
+            st.markdown(f"<p style='color:red; font-size:13px;'>{errors['model']}</p>", unsafe_allow_html=True)
 
     with r1c4:
         st.markdown("Serial No. <span style='color:red'>*</span>", unsafe_allow_html=True)
@@ -417,11 +523,11 @@ def add_inventory_dialog():
         )
         if serial_input is not None:
             st.session_state["add_serial_value"] = serial_input
+        elif "add_serial" in st.session_state and (st.session_state["add_serial"] == "" or st.session_state["add_serial"] is None):
+            st.session_state["add_serial_value"] = ""
+
         if "serial" in errors:
-            st.markdown(
-                f"<p style='color:red; font-size:13px;'>{errors['serial']}</p>",
-                unsafe_allow_html=True
-            )
+            st.markdown(f"<p style='color:red; font-size:13px;'>{errors['serial']}</p>", unsafe_allow_html=True)
 
     st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
 
@@ -440,6 +546,8 @@ def add_inventory_dialog():
         )
         if warranty_input is not None:
             st.session_state["add_warranty_value"] = warranty_input
+        elif "add_warranty" in st.session_state and (st.session_state["add_warranty"] == "" or st.session_state["add_warranty"] is None):
+            st.session_state["add_warranty_value"] = ""
 
     with r2c3:
         status_input = st_smart_text_input(
@@ -450,6 +558,8 @@ def add_inventory_dialog():
         )
         if status_input is not None:
             st.session_state["add_status_value"] = status_input
+        elif "add_status" in st.session_state and (st.session_state["add_status"] == "" or st.session_state["add_status"] is None):
+            st.session_state["add_status_value"] = ""
 
     with r2c4:
         st.text_input("Status-2", key="add_status2")
@@ -471,6 +581,8 @@ def add_inventory_dialog():
         )
         if received_input is not None:
             st.session_state["add_received_value"] = received_input
+        elif "add_received" in st.session_state and (st.session_state["add_received"] == "" or st.session_state["add_received"] is None):
+            st.session_state["add_received_value"] = ""
 
     st.markdown("<hr style='margin:6px 0;'>", unsafe_allow_html=True)
 
@@ -512,22 +624,18 @@ def add_inventory_dialog():
     if cancel_clicked:
         st.session_state.add_errors    = {}
         st.session_state.active_dialog = None
-        for key in ["add_brand_value", "add_model_value", "add_serial_value",
-                    "add_warranty_value", "add_status_value", "add_received_value"]:
-            st.session_state.pop(key, None)
         for k in [k for k in st.session_state if k.startswith("add_")]:
             st.session_state.pop(k, None)
         st.rerun()
 
     # ── Save ──
     if save_clicked:
-        # Double fallback: component value OR native session state buffer
-        final_brand    = st.session_state.get("add_brand_value",    "") or st.session_state.get("add_brand",    "")
-        final_model    = st.session_state.get("add_model_value",    "") or st.session_state.get("add_model",    "")
-        final_serial   = st.session_state.get("add_serial_value",   "") or st.session_state.get("add_serial",   "")
-        final_warranty = st.session_state.get("add_warranty_value", "") or st.session_state.get("add_warranty", "")
-        final_status   = st.session_state.get("add_status_value",   "") or st.session_state.get("add_status",   "")
-        final_received = st.session_state.get("add_received_value", "") or st.session_state.get("add_received", "")
+        final_brand    = _resolve("add_brand_value",    "add_brand")
+        final_model    = _resolve("add_model_value",    "add_model")
+        final_serial   = _resolve("add_serial_value",   "add_serial")
+        final_warranty = _resolve("add_warranty_value", "add_warranty")
+        final_status   = _resolve("add_status_value",   "add_status")
+        final_received = _resolve("add_received_value", "add_received")
 
         errors = validate_inventory({
             "brand":  final_brand,
@@ -546,16 +654,16 @@ def add_inventory_dialog():
         return_date = st.session_state.get("add_return_date", None) if _return_type == "Set Date" else None
 
         insert_inventory((
-            final_brand    or "",
-            final_model    or "",
-            final_serial   or "",
+            final_brand,
+            final_model,
+            final_serial,
             st.session_state.get("add_category", "") or "",
-            final_warranty or "",
+            final_warranty,
             st.session_state.get("add_qty", 1),
-            final_status   or "",
+            final_status,
             st.session_state.get("add_handover", "") or "",
             issue_date,
-            final_received or "",
+            final_received,
             return_date,
             st.session_state.get("add_note", "") or "",
             st.session_state.get("add_status2", "") or "",
@@ -565,9 +673,6 @@ def add_inventory_dialog():
 
         st.session_state.add_errors    = {}
         st.session_state.active_dialog = None
-        for key in ["add_brand_value", "add_model_value", "add_serial_value",
-                    "add_warranty_value", "add_status_value", "add_received_value"]:
-            st.session_state.pop(key, None)
         for k in [k for k in st.session_state if k.startswith("add_")]:
             st.session_state.pop(k, None)
 
@@ -817,7 +922,7 @@ def small(val):
     return f'<p style="font-size:12px;margin:0">{val}</p>'
 
 def safe_val(val):
-    if val is None:                              return "—"
+    if val is None:                             return "—"
     if isinstance(val, float) and pd.isna(val): return "—"
     if str(val).strip() == "":                  return "—"
     return val
@@ -851,6 +956,7 @@ for _, row in list_df.iterrows():
         if c14.button("✏️", key=f"edit_{uid}"):
             st.session_state.edit_row_data  = row.to_dict()
             st.session_state.active_dialog  = "edit"
+            st.rerun()
 
         if c15.button(":material/delete:", key=f"del_{uid}"):
             brand_val  = safe_val(row["brand"])
@@ -859,6 +965,8 @@ for _, row in list_df.iterrows():
             st.session_state.delete_id     = row["id"]
             st.session_state.delete_label  = f"{brand_val} — {model_val} (S/No: {serial_val})"
             st.session_state.active_dialog = "delete"
+            st.rerun()
+
 # ═════════════════════════════════════════════════════════
 # SINGLE DIALOG DISPATCHER — only one dialog open at a time
 # ═════════════════════════════════════════════════════════
