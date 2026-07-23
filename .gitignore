@@ -11,5 +11,3 @@ tests/
 pytest.ini
 
 # Ignore the test script
-
-# ista.py
